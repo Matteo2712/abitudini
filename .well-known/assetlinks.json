@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "dev.pages.abitudini.twa",
+        "sha256_cert_fingerprints": ["11:42:90:D8:ED:5E:E6:64:54:2D:AC:00:31:7A:E8:E1:81:A9:91:EB:BE:1D:33:56:A9:B6:AC:9A:23:1B:BE:6B"]
+      }
+    }]
