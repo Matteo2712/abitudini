@@ -269,38 +269,88 @@ function computeStreak(habitId){
 }
 
 /* ============ AUTENTICAZIONE ============
-   Login via magic link (email, senza password) — coerente con la semplicità
-   delle altre app. La sessione è gestita da Supabase Auth e persiste sul device. */
+   Login email + password, come CaliMat/PesoDigiuno.
+   La password viene gestita interamente da Supabase Auth: mai salvata in
+   chiaro (hash bcrypt in auth.users), qui teniamo solo il token di sessione. */
+let authMode = 'login'; // login | signup
+
 function renderAuthScreen(){
   document.getElementById('main').style.display = 'none';
   document.querySelector('.fab').style.display = 'none';
   document.querySelector('.tabbar').style.display = 'none';
   document.getElementById('authGate').innerHTML = `
     <div class="auth-screen">
-      <h2>Accedi ad Abitudini</h2>
-      <div class="small" style="margin-bottom:18px;">Riceverai un link di accesso via email, niente password.</div>
+      <h2>${authMode==='login' ? 'Accedi' : 'Crea account'}</h2>
+      <div class="small" style="margin-bottom:18px;">Abitudini</div>
       <div class="card">
         <label>Email</label>
-        <input type="email" id="auth-email" placeholder="tuo@email.it">
+        <input type="email" id="auth-email" placeholder="tuo@email.it" autocomplete="username">
+        <label>Password</label>
+        <input type="password" id="auth-password" placeholder="••••••••" autocomplete="${authMode==='login'?'current-password':'new-password'}">
         <div class="modal-actions">
-          <button class="btn" style="flex:1" onclick="sendMagicLink()">Invia link di accesso</button>
+          <button class="btn" style="flex:1" onclick="${authMode==='login'?'doLogin()':'doSignup()'}">${authMode==='login'?'Accedi':'Registrati'}</button>
         </div>
         <div id="auth-msg" class="small" style="margin-top:10px;"></div>
+        <div class="row" style="justify-content:space-between; margin-top:14px;">
+          <span class="small" style="cursor:pointer; text-decoration:underline;" onclick="toggleAuthMode()">${authMode==='login'?'Non hai un account? Registrati':'Hai già un account? Accedi'}</span>
+        </div>
+        ${authMode==='login' ? `<div class="small" style="cursor:pointer; text-decoration:underline; margin-top:8px;" onclick="sendPasswordReset()">Password dimenticata?</div>` : ''}
       </div>
     </div>`;
 }
 
-async function sendMagicLink(){
+function toggleAuthMode(){
+  authMode = authMode==='login' ? 'signup' : 'login';
+  renderAuthScreen();
+}
+
+async function doLogin(){
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const msgEl = document.getElementById('auth-msg');
+  if(!email || !password){ msgEl.textContent = 'Inserisci email e password.'; return; }
+  msgEl.textContent = 'Accesso in corso...';
+  try{
+    const {error} = await sb.auth.signInWithPassword({ email, password });
+    if(error) throw error;
+    // onAuthStateChange gestisce il resto
+  }catch(err){
+    msgEl.textContent = 'Errore: ' + (err.message === 'Invalid login credentials' ? 'email o password errati.' : err.message);
+  }
+}
+
+async function doSignup(){
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const msgEl = document.getElementById('auth-msg');
+  if(!email || !password){ msgEl.textContent = 'Inserisci email e password.'; return; }
+  if(password.length < 6){ msgEl.textContent = 'La password deve avere almeno 6 caratteri.'; return; }
+  msgEl.textContent = 'Creazione account...';
+  try{
+    const {data, error} = await sb.auth.signUp({ email, password });
+    if(error) throw error;
+    if(data.session){
+      // conferma email disattivata sul progetto: sessione già attiva
+    } else {
+      msgEl.textContent = 'Account creato! Controlla la tua email per confermare, poi accedi.';
+      authMode = 'login';
+    }
+  }catch(err){
+    msgEl.textContent = 'Errore: ' + err.message;
+  }
+}
+
+async function sendPasswordReset(){
   const email = document.getElementById('auth-email').value.trim();
   const msgEl = document.getElementById('auth-msg');
-  if(!email){ msgEl.textContent = 'Inserisci un indirizzo email.'; return; }
+  if(!email){ msgEl.textContent = 'Inserisci la tua email qui sopra, poi tocca di nuovo "Password dimenticata".'; return; }
   msgEl.textContent = 'Invio in corso...';
   try{
-    const {error} = await sb.auth.signInWithOtp({ email, options:{ emailRedirectTo: window.location.href } });
+    const {error} = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
     if(error) throw error;
-    msgEl.textContent = 'Link inviato! Controlla la tua email e apri il link su questo dispositivo.';
+    msgEl.textContent = 'Email di reset inviata, controlla la posta.';
   }catch(err){
-    msgEl.textContent = 'Errore invio: ' + (err.message || err);
+    msgEl.textContent = 'Errore: ' + err.message;
   }
 }
 
