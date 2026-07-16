@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Abitudini</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon-32.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="theme-color" content="#0f1420">
+<style>
+:root{
+  --bg:#0f1420; --card:#171e2c; --card2:#1d2637; --text:#e8ecf4; --muted:#8b96ab;
+  --accent:#2dd4bf; --accent2:#38bdf8; --danger:#f87171; --warn:#fbbf24; --ok:#4ade80;
+  --border:#2a3346;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+body{margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--text); padding-bottom:90px;}
+header{position:sticky; top:0; z-index:20; background:rgba(15,20,32,.92); backdrop-filter:blur(8px); padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;}
+header h1{font-size:18px; margin:0; font-weight:700; letter-spacing:.3px;}
+header h1 span{color:var(--accent);}
+.iconbtn{background:var(--card2); border:1px solid var(--border); color:var(--text); width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; cursor:pointer;}
+main{padding:14px 14px 20px;}
+.tabbar{position:fixed; bottom:0; left:0; right:0; display:flex; background:var(--card); border-top:1px solid var(--border); z-index:30;}
+.tabbar button{flex:1; background:none; border:none; color:var(--muted); padding:10px 0 8px; font-size:11px; display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer;}
+.tabbar button.active{color:var(--accent);}
+.tabbar svg{width:20px; height:20px;}
+.card{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:14px; margin-bottom:12px;}
+.habit-card{display:flex; flex-direction:column; gap:8px;}
+.habit-top{display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
+.habit-name{font-size:16px; font-weight:600;}
+.habit-freq{font-size:12px; color:var(--muted); margin-top:2px;}
+.habit-actions{display:flex; gap:6px;}
+.chip{font-size:11px; padding:3px 9px; border-radius:20px; background:var(--card2); border:1px solid var(--border); color:var(--muted); white-space:nowrap;}
+.chip.ok{color:var(--ok); border-color:#1f6d4a;}
+.chip.warn{color:var(--warn); border-color:#7a5b12;}
+.chip.danger{color:var(--danger); border-color:#7a2020;}
+.chip.streak{color:#fbbf24; border-color:#7a5b12; background:#241c0a;}
+.progress-row{display:flex; align-items:center; gap:8px;}
+.progress-bar{flex:1; height:8px; background:var(--card2); border-radius:6px; overflow:hidden;}
+.progress-fill{height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:6px; transition:width .3s;}
+.small{font-size:12px; color:var(--muted);}
+.btn{background:var(--accent); color:#06231f; border:none; border-radius:12px; padding:10px 14px; font-weight:700; font-size:14px; cursor:pointer;}
+.btn.secondary{background:var(--card2); color:var(--text); border:1px solid var(--border);}
+.btn.small{padding:7px 11px; font-size:12px; border-radius:10px;}
+.btn.ghost{background:none; border:1px solid var(--border); color:var(--muted);}
+.btn.danger{background:#3a1a1a; color:var(--danger); border:1px solid #5a2323;}
+.row{display:flex; gap:8px;}
+.row.wrap{flex-wrap:wrap;}
+.fab{position:fixed; bottom:78px; right:18px; width:56px; height:56px; border-radius:50%; background:var(--accent); color:#06231f; border:none; font-size:28px; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 20px rgba(45,212,191,.4); z-index:25; cursor:pointer;}
+.modal-bg{position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:50; display:flex; align-items:flex-end; justify-content:center;}
+.modal-bg.center{align-items:center;}
+.modal{background:var(--card); border-radius:20px 20px 0 0; padding:20px; width:100%; max-width:480px; max-height:88vh; overflow-y:auto;}
+.modal-bg.center .modal{border-radius:18px;}
+.modal h2{margin:0 0 14px; font-size:17px;}
+label{display:block; font-size:12px; color:var(--muted); margin:12px 0 5px;}
+input,select{width:100%; background:var(--card2); border:1px solid var(--border); color:var(--text); padding:11px 12px; border-radius:10px; font-size:15px;}
+input[type=number]{width:90px;}
+.freq-row{display:flex; align-items:center; gap:8px;}
+.modal-actions{display:flex; gap:10px; margin-top:20px;}
+.modal-actions .btn{flex:1;}
+.empty{text-align:center; padding:40px 20px; color:var(--muted);}
+.empty svg{width:48px; height:48px; opacity:.4; margin-bottom:10px;}
+.toast{position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:#1d2637; border:1px solid var(--border); color:var(--text); padding:12px 16px; border-radius:14px; display:flex; align-items:center; gap:14px; z-index:100; box-shadow:0 8px 24px rgba(0,0,0,.4); font-size:14px; animation:slideup .2s ease;}
+@keyframes slideup{from{transform:translate(-50%,20px); opacity:0} to{transform:translate(-50%,0); opacity:1}}
+.toast button{background:none; border:none; color:var(--accent); font-weight:700; font-size:14px; cursor:pointer;}
+.history-item{display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border);}
+.history-item:last-child{border-bottom:none;}
+.history-item .del{background:none; border:none; color:var(--danger); cursor:pointer; padding:4px;}
+.chart-wrap{overflow-x:auto; padding-top:6px;}
+.bars{display:flex; align-items:flex-end; gap:4px; height:80px; min-width:100%;}
+.bar-col{display:flex; flex-direction:column; align-items:center; gap:4px; flex-shrink:0; width:22px;}
+.bar{width:14px; background:var(--card2); border-radius:3px 3px 0 0; min-height:2px;}
+.bar.hit{background:linear-gradient(180deg,var(--accent2),var(--accent));}
+.bar-label{font-size:9px; color:var(--muted); writing-mode:vertical-rl;}
+.reminder-banner{background:linear-gradient(135deg,#1c2f3a,#17222f); border:1px solid #2a4a52; border-radius:16px; padding:14px; margin-bottom:14px;}
+.reminder-banner h3{margin:0 0 8px; font-size:14px; color:var(--accent);}
+.reminder-item{display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.06);}
+.reminder-item:last-child{border-bottom:none;}
+.section-title{font-size:13px; color:var(--muted); margin:18px 0 8px; text-transform:uppercase; letter-spacing:.5px;}
+#connStatus{position:fixed; top:8px; right:12px; font-size:10px; color:var(--muted); z-index:40;}
+.sort-row{display:flex; gap:6px; margin-bottom:12px; overflow-x:auto;}
+.sort-btn{background:var(--card2); border:1px solid var(--border); color:var(--muted); font-size:12px; padding:7px 12px; border-radius:20px; white-space:nowrap; cursor:pointer;}
+.sort-btn.active{color:var(--accent); border-color:var(--accent);}
+.reorder-arrows{display:flex; flex-direction:column; gap:2px;}
+.reorder-arrows button{background:var(--card2); border:1px solid var(--border); color:var(--muted); width:26px; height:22px; border-radius:6px; cursor:pointer; font-size:11px; line-height:1;}
+.motivation-card{background:linear-gradient(135deg,#241c0a,#1c1508); border:1px solid #4a3a12; border-radius:16px; padding:14px; margin-bottom:14px;}
+.motivation-card h3{margin:0 0 6px; font-size:14px; color:var(--warn);}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Abit<span>udini</span></h1>
+  <button class="iconbtn" onclick="requestNotifPermission()" title="Notifiche">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+  </button>
+</header>
+
+<div id="connStatus"></div>
+
+<main id="main"></main>
+
+<button class="fab" onclick="openHabitModal()">+</button>
+
+<div class="tabbar">
+  <button class="tab-btn active" data-tab="oggi" onclick="switchTab('oggi')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    Oggi
+  </button>
+  <button class="tab-btn" data-tab="abitudini" onclick="switchTab('abitudini')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Abitudini
+  </button>
+  <button class="tab-btn" data-tab="storico" onclick="switchTab('storico')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+    Storico
+  </button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ============ CONFIG ============
+   Stesso progetto Supabase di CaliMat / PesoDigiuno. */
+const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR-ANON-KEY";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ============ SCHEMA (SQL da eseguire una volta su Supabase) ============
+create table abit_abitudini (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users default auth.uid(),
+  nome text not null,
+  target_volte int not null default 1,
+  target_periodo text not null default 'giorno',
+  ordine int not null default 0,
+  colore text default '#2dd4bf',
+  archiviata boolean default false,
+  created_at timestamptz default now()
+);
+create table abit_abitudini_log (
+  id uuid primary key default gen_random_uuid(),
+  habit_id uuid references abit_abitudini(id) on delete cascade,
+  user_id uuid references auth.users default auth.uid(),
+  fatto_at timestamptz not null default now(),
+  nota text,
+  created_at timestamptz default now()
+);
+alter table abit_abitudini enable row level security;
+alter table abit_abitudini_log enable row level security;
+create policy "own rows" on abit_abitudini for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "own rows" on abit_abitudini_log for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+=========================================================================== */
+
+const PERIOD_LABEL = {giorno:'giorno', settimana:'settimana', mese:'mese', anno:'anno'};
+
+let state = {
+  habits: [],
+  logs: {},
+  tab: 'oggi',
+  sortMode: localStorage.getItem('ab_sort') || 'personale',
+  online: navigator.onLine,
+};
+
+const PENDING_KEY = 'ab_pending_sync';
+
+function uid(){ return crypto.randomUUID ? crypto.randomUUID() : 'id-'+Date.now()+Math.random(); }
+
+function localDateKey(d=new Date()){
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
+function fmtAgo(dateStr){
+  if(!dateStr) return 'mai fatto';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const min = Math.floor(diff/60000), h=Math.floor(diff/3600000), d=Math.floor(diff/86400000);
+  if(diff < 60000) return 'poco fa';
+  if(min < 60) return `${min} min fa`;
+  if(h < 24) return `${h} or${h===1?'a':'e'} fa`;
+  if(d < 30) return `${d} giorn${d===1?'o':'i'} fa`;
+  const months = Math.floor(d/30);
+  if(months < 12) return `${months} mes${months===1?'e':'i'} fa`;
+  return `${Math.floor(months/12)} ann${Math.floor(months/12)===1?'o':'i'} fa`;
+}
+
+function fmtDateTime(dateStr){
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'2-digit'}) + ' ' + d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+}
+
+/* ============ PERIODI DI CALENDARIO ============ */
+function periodStart(periodo, ref=new Date()){
+  const d = new Date(ref);
+  if(periodo==='giorno'){ d.setHours(0,0,0,0); return d; }
+  if(periodo==='settimana'){
+    const day = (d.getDay()+6)%7;
+    d.setDate(d.getDate()-day); d.setHours(0,0,0,0); return d;
+  }
+  if(periodo==='mese'){ d.setDate(1); d.setHours(0,0,0,0); return d; }
+  if(periodo==='anno'){ d.setMonth(0,1); d.setHours(0,0,0,0); return d; }
+}
+function periodEnd(periodo, start){
+  const d = new Date(start);
+  if(periodo==='giorno') d.setDate(d.getDate()+1);
+  else if(periodo==='settimana') d.setDate(d.getDate()+7);
+  else if(periodo==='mese') d.setMonth(d.getMonth()+1);
+  else if(periodo==='anno') d.setFullYear(d.getFullYear()+1);
+  return d;
+}
+
+function countInPeriod(habitId, periodo){
+  const l = state.logs[habitId] || [];
+  const start = periodStart(periodo).getTime();
+  return l.filter(x=> new Date(x.fatto_at).getTime() >= start).length;
+}
+
+/* Criterio "da fare oggi":
+   - giornaliere: finché non raggiungono il target del giorno
+   - settimanali/mensili/annuali: mostrate se si è indietro rispetto al ritmo
+     atteso in base alla frazione di periodo già trascorsa
+     (es. 2x/anno, se non fatta e siamo già a metà anno, compare come da fare) */
+function isDueToday(h){
+  const done = countInPeriod(h.id, h.target_periodo);
+  if(h.target_periodo==='giorno') return done < h.target_volte;
+  const start = periodStart(h.target_periodo);
+  const end = periodEnd(h.target_periodo, start);
+  const elapsedFrac = (Date.now()-start.getTime())/(end.getTime()-start.getTime());
+  const expected = Math.ceil(h.target_volte * elapsedFrac);
+  return done < expected;
+}
+
+function habitStatus(h){
+  const done = countInPeriod(h.id, h.target_periodo);
+  const ratio = done / h.target_volte;
+  if(ratio >= 1) return 'ok';
+  return isDueToday(h) ? 'warn' : 'danger';
+}
+
+/* ============ STREAK (motivazione, calcolata solo dai log già presenti) ============ */
+function computeStreak(habitId){
+  const logs = state.logs[habitId] || [];
+  if(!logs.length) return 0;
+  const daysWithLog = new Set(logs.map(l=> localDateKey(new Date(l.fatto_at))));
+  let streak = 0;
+  let cursor = new Date();
+  if(!daysWithLog.has(localDateKey(cursor))) cursor.setDate(cursor.getDate()-1);
+  while(daysWithLog.has(localDateKey(cursor))){
+    streak++;
+    cursor.setDate(cursor.getDate()-1);
+  }
+  return streak;
+}
+
+/* ============ DATA LOAD ============ */
+async function loadAll(){
+  try{
+    const {data: habits, error:e1} = await sb.from('abit_abitudini').select('*').eq('archiviata', false).order('ordine',{ascending:true});
+    if(e1) throw e1;
+    state.habits = habits || [];
+    const {data: logs, error:e2} = await sb.from('abit_abitudini_log').select('*').order('fatto_at',{ascending:false});
+    if(e2) throw e2;
+    state.logs = {};
+    (logs||[]).forEach(l=>{
+      (state.logs[l.habit_id] = state.logs[l.habit_id] || []).push(l);
+    });
+    setConn(true);
+  }catch(err){
+    console.error(err);
+    setConn(false);
+  }
+  render();
+}
+
+function setConn(ok){
+  state.online = ok;
+  const el = document.getElementById('connStatus');
+  el.innerHTML = ok ? '' : '<span style="color:var(--danger)">● offline</span>';
+}
+
+/* ============ RENDER ============ */
+function switchTab(t){
+  state.tab = t;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===t));
+  render();
+}
+
+function render(){
+  const main = document.getElementById('main');
+  if(state.tab==='oggi') main.innerHTML = renderOggi();
+  else if(state.tab==='abitudini') main.innerHTML = renderAbitudini();
+  else main.innerHTML = renderStorico();
+}
+
+function lastLog(habitId){
+  const l = state.logs[habitId];
+  return l && l.length ? l[0] : null;
+}
+
+/* TAB "OGGI": SOLO le abitudini da fare oggi (niente elenco completo qui) */
+function renderOggi(){
+  if(!state.habits.length) return emptyState();
+  const due = state.habits.filter(isDueToday);
+
+  let html = motivationCard();
+
+  html += `<div class="reminder-banner"><h3>📋 Da fare oggi</h3>`;
+  if(!due.length){
+    html += `<div class="reminder-item"><span class="small">Tutto fatto per oggi 🎉</span></div>`;
+  } else {
+    due.forEach(h=>{
+      const done = countInPeriod(h.id, h.target_periodo);
+      const periodoLbl = h.target_periodo==='giorno' ? '' : ` <span class="small">(${PERIOD_LABEL[h.target_periodo]})</span>`;
+      html += `<div class="reminder-item">
+        <span>${esc(h.nome)}${periodoLbl} <span class="small">${done}/${h.target_volte}</span></span>
+        <button class="btn small" onclick="quickLog('${h.id}')">Fatto ✓</button>
+      </div>`;
+    });
+  }
+  html += `</div>`;
+  return html;
+}
+
+function motivationCard(){
+  let bestStreak = 0, bestName = '';
+  state.habits.forEach(h=>{
+    const s = computeStreak(h.id);
+    if(s > bestStreak){ bestStreak = s; bestName = h.nome; }
+  });
+
+  const now = new Date();
+  const weekStart = periodStart('settimana', now).getTime();
+  const prevWeekStart = weekStart - 7*86400000;
+  let thisWeek = 0, lastWeek = 0;
+  Object.values(state.logs).forEach(arr=> arr.forEach(l=>{
+    const t = new Date(l.fatto_at).getTime();
+    if(t >= weekStart) thisWeek++;
+    else if(t >= prevWeekStart && t < weekStart) lastWeek++;
+  }));
+
+  if(!bestStreak && !thisWeek) return '';
+
+  let trendMsg = '';
+  if(lastWeek>0){
+    if(thisWeek > lastWeek) trendMsg = `Stai andando meglio della settimana scorsa (${thisWeek} vs ${lastWeek}) 💪`;
+    else if(thisWeek < lastWeek) trendMsg = `Questa settimana sei un po' più indietro rispetto alla precedente (${thisWeek} vs ${lastWeek})`;
+    else trendMsg = `Stesso ritmo della settimana scorsa (${thisWeek} attività)`;
+  } else if(thisWeek>0){
+    trendMsg = `${thisWeek} attività registrate questa settimana`;
+  }
+
+  return `<div class="motivation-card">
+    <h3>🔥 ${bestStreak>0 ? `${bestStreak} giorni di fila su "${esc(bestName)}"` : 'Continua così'}</h3>
+    <div class="small">${trendMsg}</div>
+  </div>`;
+}
+
+function habitCard(h, showReorder){
+  const done = countInPeriod(h.id, h.target_periodo);
+  const status = habitStatus(h);
+  const pct = Math.min(100, Math.round(done / h.target_volte * 100));
+  const last = lastLog(h.id);
+  const streak = computeStreak(h.id);
+  return `<div class="card habit-card">
+    <div class="habit-top">
+      <div style="flex:1">
+        <div class="habit-name">${esc(h.nome)}</div>
+        <div class="habit-freq">${h.target_volte}× al ${PERIOD_LABEL[h.target_periodo]}</div>
+      </div>
+      <div class="row" style="align-items:flex-start; gap:6px;">
+        ${streak>1 ? `<span class="chip streak">🔥 ${streak}g</span>` : ''}
+        <span class="chip ${status}">${done}/${h.target_volte}</span>
+        ${showReorder ? `<div class="reorder-arrows">
+          <button onclick="moveHabit('${h.id}',-1)">▲</button>
+          <button onclick="moveHabit('${h.id}',1)">▼</button>
+        </div>` : ''}
+      </div>
+    </div>
+    <div class="progress-row">
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="row" style="justify-content:space-between; align-items:center;">
+      <span class="small">Ultima: ${fmtAgo(last?.fatto_at)}</span>
+      <div class="habit-actions">
+        <button class="btn small secondary" onclick="openManualLog('${h.id}')">＋ manuale</button>
+        <button class="btn small" onclick="quickLog('${h.id}')">Fatto ✓</button>
+      </div>
+    </div>
+    <div class="row wrap" style="margin-top:2px;">
+      <button class="btn small secondary" onclick="openHabitModal('${h.id}')">✏️ Modifica</button>
+      <button class="btn small secondary" onclick="showHistory('${h.id}')">🕘 Storico</button>
+      <button class="btn small danger" onclick="deleteHabit('${h.id}')">🗑 Elimina</button>
+    </div>
+    ${renderChart(h)}
+  </div>`;
+}
+
+function sortedHabits(){
+  const arr = [...state.habits];
+  if(state.sortMode==='alfabetico') arr.sort((a,b)=> a.nome.localeCompare(b.nome,'it'));
+  else if(state.sortMode==='frequenza'){
+    const rank = {giorno:0, settimana:1, mese:2, anno:3};
+    arr.sort((a,b)=> (rank[a.target_periodo]-rank[b.target_periodo]) || (b.target_volte-a.target_volte));
+  } else {
+    arr.sort((a,b)=> (a.ordine||0)-(b.ordine||0));
+  }
+  return arr;
+}
+
+function setSortMode(mode){
+  state.sortMode = mode;
+  localStorage.setItem('ab_sort', mode);
+  render();
+}
+
+/* TAB "ABITUDINI": elenco completo con grafico, ordinamento, modifica/elimina */
+function renderAbitudini(){
+  if(!state.habits.length) return emptyState();
+  const modes = [['personale','Personale'],['alfabetico','Alfabetico'],['frequenza','Frequenza']];
+  let html = `<div class="sort-row">${modes.map(([k,l])=>
+    `<button class="sort-btn ${state.sortMode===k?'active':''}" onclick="setSortMode('${k}')">${l}</button>`
+  ).join('')}</div>`;
+  const list = sortedHabits();
+  html += list.map(h=> habitCard(h, state.sortMode==='personale')).join('');
+  return html;
+}
+
+function renderChart(h){
+  const days = [];
+  for(let i=13;i>=0;i--){
+    const d = new Date(); d.setDate(d.getDate()-i);
+    days.push(d);
+  }
+  const logs = state.logs[h.id] || [];
+  const counts = days.map(d=>{
+    const key = localDateKey(d);
+    return logs.filter(l=> localDateKey(new Date(l.fatto_at))===key).length;
+  });
+  const max = Math.max(1, ...counts);
+  const bars = days.map((d,i)=>{
+    const c = counts[i];
+    const heightPct = c===0 ? 3 : Math.max(10, Math.round(c/max*100));
+    return `<div class="bar-col">
+      <div class="bar ${c>0?'hit':''}" style="height:${heightPct}%"></div>
+      <div class="bar-label">${d.getDate()}/${d.getMonth()+1}</div>
+    </div>`;
+  }).join('');
+  return `<div class="chart-wrap"><div class="bars">${bars}</div></div>`;
+}
+
+async function moveHabit(habitId, dir){
+  const list = sortedHabits();
+  const idx = list.findIndex(h=>h.id===habitId);
+  const swapIdx = idx+dir;
+  if(swapIdx<0 || swapIdx>=list.length) return;
+  const a = list[idx], b = list[swapIdx];
+  const tmp = a.ordine; a.ordine = b.ordine; b.ordine = tmp;
+  render();
+  try{
+    await sb.from('abit_abitudini').update({ordine:a.ordine}).eq('id', a.id);
+    await sb.from('abit_abitudini').update({ordine:b.ordine}).eq('id', b.id);
+  }catch(err){
+    queuePending('update_habit', {id:a.id, ordine:a.ordine});
+    queuePending('update_habit', {id:b.id, ordine:b.ordine});
+  }
+}
+
+/* TAB "STORICO": solo elenco cronologico dei log, distinto dalla tab Abitudini */
+function renderStorico(){
+  const allLogs = [];
+  state.habits.forEach(h=>{
+    (state.logs[h.id]||[]).forEach(l=> allLogs.push({...l, habitName:h.nome}));
+  });
+  allLogs.sort((a,b)=> new Date(b.fatto_at) - new Date(a.fatto_at));
+  if(!allLogs.length) return emptyState('Nessuna attività registrata ancora.');
+  return `<div class="card">` + allLogs.map(l=>`
+    <div class="history-item">
+      <div>
+        <div>${esc(l.habitName)}</div>
+        <div class="small">${fmtDateTime(l.fatto_at)}${l.nota?' · '+esc(l.nota):''}</div>
+      </div>
+      <button class="del" onclick="deleteLog('${l.id}','${l.habit_id}')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+      </button>
+    </div>`).join('') + `</div>`;
+}
+
+function emptyState(msg){
+  return `<div class="empty">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    <div>${msg || 'Nessuna abitudine ancora. Tocca + per crearne una.'}</div>
+  </div>`;
+}
+
+function esc(s){ return (s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+/* ============ ACTIONS ============ */
+async function quickLog(habitId){
+  const entry = {id: uid(), habit_id: habitId, fatto_at: new Date().toISOString(), nota:null};
+  state.logs[habitId] = state.logs[habitId] || [];
+  state.logs[habitId].unshift(entry);
+  render();
+  try{
+    const {error} = await sb.from('abit_abitudini_log').insert({id:entry.id, habit_id:habitId, fatto_at:entry.fatto_at});
+    if(error) throw error;
+    setConn(true);
+  }catch(err){ queuePending('insert_log', entry); setConn(false); }
+}
+
+function openManualLog(habitId){
+  const h = state.habits.find(x=>x.id===habitId);
+  const now = new Date();
+  const dateVal = localDateKey(now);
+  const timeVal = now.toTimeString().slice(0,5);
+  showModal(`
+    <h2>Registra manualmente</h2>
+    <div class="small">${esc(h.nome)}</div>
+    <label>Data</label>
+    <input type="date" id="ml-date" value="${dateVal}">
+    <label>Ora</label>
+    <input type="time" id="ml-time" value="${timeVal}">
+    <label>Nota (opzionale)</label>
+    <input type="text" id="ml-nota" placeholder="es. dopo cena">
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Annulla</button>
+      <button class="btn" onclick="saveManualLog('${habitId}')">Salva</button>
+    </div>
+  `);
+}
+
+async function saveManualLog(habitId){
+  const date = document.getElementById('ml-date').value;
+  const time = document.getElementById('ml-time').value || '00:00';
+  const nota = document.getElementById('ml-nota').value.trim();
+  const fatto_at = new Date(`${date}T${time}:00`).toISOString();
+  const entry = {id: uid(), habit_id: habitId, fatto_at, nota: nota || null};
+  state.logs[habitId] = state.logs[habitId] || [];
+  state.logs[habitId].push(entry);
+  state.logs[habitId].sort((a,b)=> new Date(b.fatto_at)-new Date(a.fatto_at));
+  closeModal(); render();
+  try{
+    const {error} = await sb.from('abit_abitudini_log').insert({id:entry.id, habit_id:habitId, fatto_at, nota: entry.nota});
+    if(error) throw error;
+  }catch(err){ queuePending('insert_log', entry); setConn(false); }
+}
+
+function deleteLog(logId, habitId){
+  const arr = state.logs[habitId] || [];
+  const idx = arr.findIndex(l=>l.id===logId);
+  if(idx===-1) return;
+  const removed = arr.splice(idx,1)[0];
+  render();
+  showUndoToast('Registrazione eliminata', async ()=>{
+    arr.splice(idx,0,removed);
+    render();
+  }, async ()=>{
+    try{ await sb.from('abit_abitudini_log').delete().eq('id', logId); }
+    catch(err){ queuePending('delete_log', {id:logId}); }
+  });
+}
+
+function deleteHabit(habitId){
+  const idx = state.habits.findIndex(h=>h.id===habitId);
+  if(idx===-1) return;
+  const removed = state.habits.splice(idx,1)[0];
+  const removedLogs = state.logs[habitId];
+  delete state.logs[habitId];
+  render();
+  showUndoToast(`"${removed.nome}" eliminata`, ()=>{
+    state.habits.splice(idx,0,removed);
+    if(removedLogs) state.logs[habitId] = removedLogs;
+    render();
+  }, async ()=>{
+    try{ await sb.from('abit_abitudini').delete().eq('id', habitId); }
+    catch(err){ queuePending('delete_habit', {id:habitId}); }
+  });
+}
+
+function openHabitModal(habitId){
+  const h = habitId ? state.habits.find(x=>x.id===habitId) : null;
+  showModal(`
+    <h2>${h?'Modifica abitudine':'Nuova abitudine'}</h2>
+    <label>Nome</label>
+    <input type="text" id="h-nome" value="${h?esc(h.nome):''}" placeholder="es. Studiare fagotto">
+    <label>Frequenza desiderata</label>
+    <div class="freq-row">
+      <input type="number" id="h-volte" min="1" value="${h?h.target_volte:1}">
+      <span class="small">volte al</span>
+      <select id="h-periodo">
+        ${Object.keys(PERIOD_LABEL).map(p=>`<option value="${p}" ${h&&h.target_periodo===p?'selected':''}>${PERIOD_LABEL[p]}</option>`).join('')}
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Annulla</button>
+      <button class="btn" onclick="saveHabit(${h?`'${h.id}'`:'null'})">Salva</button>
+    </div>
+  `, true);
+}
+
+async function saveHabit(habitId){
+  const nome = document.getElementById('h-nome').value.trim();
+  const volte = parseInt(document.getElementById('h-volte').value) || 1;
+  const periodo = document.getElementById('h-periodo').value;
+  if(!nome){ alert('Inserisci un nome'); return; }
+  closeModal();
+  if(habitId){
+    const h = state.habits.find(x=>x.id===habitId);
+    h.nome = nome; h.target_volte = volte; h.target_periodo = periodo;
+    render();
+    try{ await sb.from('abit_abitudini').update({nome, target_volte:volte, target_periodo:periodo}).eq('id', habitId); }
+    catch(err){ queuePending('update_habit', {id:habitId, nome, target_volte:volte, target_periodo:periodo}); }
+  } else {
+    const maxOrdine = state.habits.reduce((m,h)=> Math.max(m, h.ordine||0), 0);
+    const entry = {id: uid(), nome, target_volte:volte, target_periodo:periodo, ordine:maxOrdine+1, archiviata:false, created_at:new Date().toISOString()};
+    state.habits.push(entry);
+    state.logs[entry.id] = [];
+    render();
+    try{ await sb.from('abit_abitudini').insert({id:entry.id, nome, target_volte:volte, target_periodo:periodo, ordine:entry.ordine}); }
+    catch(err){ queuePending('insert_habit', entry); }
+  }
+}
+
+function showHistory(habitId){
+  const h = state.habits.find(x=>x.id===habitId);
+  const logs = state.logs[habitId] || [];
+  showModal(`
+    <h2>Storico — ${esc(h.nome)}</h2>
+    ${logs.length ? logs.map(l=>`
+      <div class="history-item">
+        <div class="small">${fmtDateTime(l.fatto_at)}${l.nota?' · '+esc(l.nota):''}</div>
+        <button class="del" onclick="deleteLog('${l.id}','${habitId}'); showHistory('${habitId}')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        </button>
+      </div>`).join('') : '<div class="small">Nessuna registrazione.</div>'}
+    <div class="modal-actions"><button class="btn secondary" onclick="closeModal()">Chiudi</button></div>
+  `);
+}
+
+/* ============ MODAL / TOAST ============ */
+function showModal(html, center){
+  let bg = document.getElementById('modalBg');
+  if(bg) bg.remove();
+  bg = document.createElement('div');
+  bg.id = 'modalBg';
+  bg.className = 'modal-bg' + (center ? ' center' : '');
+  bg.onclick = (e)=>{ if(e.target===bg) closeModal(); };
+  bg.innerHTML = `<div class="modal">${html}</div>`;
+  document.body.appendChild(bg);
+}
+function closeModal(){ const bg = document.getElementById('modalBg'); if(bg) bg.remove(); }
+
+let toastTimer = null;
+function showUndoToast(msg, onUndo, onConfirm){
+  const old = document.getElementById('undoToast');
+  if(old){ old.remove(); if(old._confirm) old._confirm(); }
+  const t = document.createElement('div');
+  t.id = 'undoToast';
+  t.className = 'toast';
+  t.innerHTML = `<span>${msg}</span><button id="undoBtn">Annulla</button>`;
+  document.body.appendChild(t);
+  let undone = false;
+  t._confirm = ()=>{ if(!undone) onConfirm(); };
+  t.querySelector('#undoBtn').onclick = ()=>{
+    undone = true;
+    clearTimeout(toastTimer);
+    t.remove();
+    onUndo();
+  };
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{
+    if(!undone){ onConfirm(); }
+    t.remove();
+  }, 5000);
+}
+
+/* ============ OFFLINE QUEUE ============ */
+function queuePending(action, data){
+  const q = JSON.parse(localStorage.getItem(PENDING_KEY) || '[]');
+  q.push({action, data, ts: Date.now()});
+  localStorage.setItem(PENDING_KEY, JSON.stringify(q));
+}
+async function flushPending(){
+  const q = JSON.parse(localStorage.getItem(PENDING_KEY) || '[]');
+  if(!q.length) return;
+  const remaining = [];
+  for(const item of q){
+    try{
+      if(item.action==='insert_habit') await sb.from('abit_abitudini').insert(item.data);
+      else if(item.action==='update_habit'){ const {id, ...rest} = item.data; await sb.from('abit_abitudini').update(rest).eq('id', id); }
+      else if(item.action==='delete_habit') await sb.from('abit_abitudini').delete().eq('id', item.data.id);
+      else if(item.action==='insert_log') await sb.from('abit_abitudini_log').insert({id:item.data.id, habit_id:item.data.habit_id, fatto_at:item.data.fatto_at, nota:item.data.nota});
+      else if(item.action==='delete_log') await sb.from('abit_abitudini_log').delete().eq('id', item.data.id);
+    }catch(err){ remaining.push(item); }
+  }
+  localStorage.setItem(PENDING_KEY, JSON.stringify(remaining));
+}
+
+window.addEventListener('online', async ()=>{ setConn(true); await flushPending(); await loadAll(); });
+window.addEventListener('offline', ()=> setConn(false));
+
+/* ============ NOTIFICHE ============ */
+async function requestNotifPermission(){
+  if(!('Notification' in window)){ alert('Notifiche non supportate su questo dispositivo.'); return; }
+  const perm = await Notification.requestPermission();
+  if(perm==='granted'){
+    alert("Notifiche attivate. Riceverai un promemoria quando apri l'app se ci sono abitudini da fare.");
+    checkDailyReminder(true);
+  }
+}
+function checkDailyReminder(force){
+  if(!('Notification' in window) || Notification.permission!=='granted') return;
+  const lastCheck = localStorage.getItem('ab_last_reminder');
+  const today = localDateKey();
+  if(!force && lastCheck===today) return;
+  const due = state.habits.filter(isDueToday);
+  if(due.length){
+    new Notification('Abitudini di oggi', { body: due.map(h=>h.nome).join(', ') });
+  }
+  localStorage.setItem('ab_last_reminder', today);
+}
+
+/* ============ SERVICE WORKER (offline shell) ============ */
+if('serviceWorker' in navigator){
+  const swCode = `
+    self.addEventListener('install', e=>self.skipWaiting());
+    self.addEventListener('activate', e=>self.clients.claim());
+    self.addEventListener('fetch', e=>{});
+  `;
+  const blob = new Blob([swCode], {type:'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+}
+
+/* ============ INIT ============ */
+loadAll().then(()=> checkDailyReminder(false));
+setInterval(()=>{ render(); }, 60000);
+</script>
+</body>
+</html>
