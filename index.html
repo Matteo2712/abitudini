@@ -39,7 +39,6 @@ main{padding:14px 14px 20px; max-width:600px; margin:0 auto;}
 .chip.ok{color:var(--ok); border-color:#1f6d4a;}
 .chip.warn{color:var(--warn); border-color:#7a5b12;}
 .chip.danger{color:var(--danger); border-color:#7a2020;}
-.chip.streak{color:#fbbf24; border-color:#7a5b12; background:#241c0a;}
 .progress-row{display:flex; align-items:center; gap:8px;}
 .progress-bar{flex:1; height:8px; background:var(--card2); border-radius:6px; overflow:hidden;}
 .progress-fill{height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:6px; transition:width .3s;}
@@ -90,8 +89,6 @@ input[type=number]{width:90px;}
 .habit-card.dragging{opacity:.4;}
 .kebab{background:none; border:none; color:var(--muted); cursor:pointer; padding:4px 6px;}
 .kebab svg{width:20px; height:20px;}
-.motivation-card{background:linear-gradient(135deg,#241c0a,#1c1508); border:1px solid #4a3a12; border-radius:16px; padding:14px; margin-bottom:14px;}
-.motivation-card h3{margin:0 0 6px; font-size:14px; color:var(--warn);}
 .auth-screen{min-height:80vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; text-align:center;}
 .auth-screen h2{font-size:20px; margin-bottom:6px;}
 .auth-screen .card{width:100%; max-width:340px; text-align:left;}
@@ -137,10 +134,43 @@ input[type=number]{width:90px;}
 <script>
 /* ============ CONFIG ============
    Stesso progetto Supabase di CaliMat / PesoDigiuno. */
-const SUPABASE_URL = 'https://edlvmkjctzhqoswpppds.supabase.co/';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkbHZta2pjdHpocW9zd3BwcGRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNjEyMDEsImV4cCI6MjA5NjczNzIwMX0.Oq0TyYWG4LotZhH57LQtklUdVho_kQ15KlSs8KGO2AM';
-
+const SUPABASE_URL = "https://edlvmkjctzhqoswpppds.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkbHZta2pjdHpocW9zd3BwcGRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNjEyMDEsImV4cCI6MjA5NjczNzIwMX0.Oq0TyYWG4LotZhH57LQtklUdVho_kQ15KlSs8KGO2AM";
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ============ SCHEMA (SQL — esegui le ALTER se il progetto ha già le tabelle) ============
+create table abit_abitudini (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users default auth.uid(),
+  nome text not null,
+  tipo text not null default 'checkbox',        -- checkbox | quantita
+  unita text,                                   -- solo per tipo 'quantita', es. 'km','litri','minuti','kcal'
+  target_volte numeric not null default 1,       -- n. volte (checkbox) oppure obiettivo quantità (quantita)
+  target_periodo text not null default 'giorno', -- giorno | settimana | mese | anno
+  ordine int not null default 0,
+  colore text default '#2dd4bf',
+  archiviata boolean default false,
+  created_at timestamptz default now()
+);
+create table abit_abitudini_log (
+  id uuid primary key default gen_random_uuid(),
+  habit_id uuid references abit_abitudini(id) on delete cascade,
+  user_id uuid references auth.users default auth.uid(),
+  fatto_at timestamptz not null default now(),
+  valore numeric,                                -- solo per tipo 'quantita'
+  nota text,
+  created_at timestamptz default now()
+);
+alter table abit_abitudini enable row level security;
+alter table abit_abitudini_log enable row level security;
+create policy "own rows" on abit_abitudini for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "own rows" on abit_abitudini_log for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- Se le tabelle esistono già senza queste colonne:
+-- alter table abit_abitudini add column if not exists tipo text not null default 'checkbox';
+-- alter table abit_abitudini add column if not exists unita text;
+-- alter table abit_abitudini_log add column if not exists valore numeric;
+=========================================================================== */
 
 const PERIOD_LABEL = {giorno:'giorno', settimana:'settimana', mese:'mese', anno:'anno'};
 const PENDING_KEY = 'ab_pending_sync';
@@ -159,7 +189,7 @@ function uid(){ return crypto.randomUUID ? crypto.randomUUID() : 'id-'+Date.now(
 
 /* ============ "FINE GIORNATA" PERSONALIZZATA ============
    Se l'utente va a letto alle 3, la mezzanotte non è un confine di giornata
-   utile. Tutto ciò che riguarda "quale giorno è" (streak, grafico, periodo
+   utile. Tutto ciò che riguarda "quale giorno è" (grafico, periodo
    giornaliero) viene calcolato spostando l'orologio indietro di dayStartHour
    ore prima di leggere anno/mese/giorno. */
 function dayShiftMs(){ return state.dayStartHour * 3600000; }
@@ -242,25 +272,6 @@ function habitStatus(h){
 function fmtAmount(h, n){
   const num = h.tipo==='quantita' ? (Math.round(n*100)/100) : n;
   return h.tipo==='quantita' ? `${num}${h.unita ? ' '+esc(h.unita) : ''}` : `${num}`;
-}
-
-/* ============ STREAK (calcolata solo dai log già presenti) ============ */
-function computeStreak(h){
-  const logs = state.logs[h.id] || [];
-  if(!logs.length) return 0;
-  let daysOk;
-  if(h.tipo==='quantita'){
-    const perDay = {};
-    logs.forEach(l=>{ const k=localDateKey(new Date(l.fatto_at)); perDay[k]=(perDay[k]||0)+(Number(l.valore)||0); });
-    daysOk = new Set(Object.keys(perDay).filter(k=> perDay[k] >= h.target_volte));
-  } else {
-    daysOk = new Set(logs.map(l=> localDateKey(new Date(l.fatto_at))));
-  }
-  let streak = 0;
-  let cursor = new Date();
-  if(!daysOk.has(localDateKey(cursor))) cursor.setDate(cursor.getDate()-1);
-  while(daysOk.has(localDateKey(cursor))){ streak++; cursor.setDate(cursor.getDate()-1); }
-  return streak;
 }
 
 /* ============ AUTENTICAZIONE (email + password, come CaliMat/PesoDigiuno) ============ */
@@ -536,14 +547,11 @@ function render(){
 }
 function lastLog(habitId){ const l = state.logs[habitId]; return l && l.length ? l[0] : null; }
 
-function pluralWord(n, sing, plur){ return n===1 ? sing : plur; }
-
 /* TAB "OGGI": solo il riepilogo da fare oggi + motivazione */
 function renderOggi(){
   if(!state.habits.length) return emptyState();
   const due = state.habits.filter(isDueToday);
-  let html = motivationCard();
-  html += `<div class="reminder-banner"><h3>📋 Da fare oggi</h3>`;
+  let html = `<div class="reminder-banner"><h3>📋 Da fare oggi</h3>`;
   if(!due.length){
     html += `<div class="reminder-item"><span class="small">Tutto fatto per oggi 🎉</span></div>`;
   } else {
@@ -561,46 +569,11 @@ function renderOggi(){
   return html;
 }
 
-function motivationCard(){
-  let bestStreak = 0, bestName = '';
-  state.habits.forEach(h=>{
-    const s = computeStreak(h);
-    if(s > bestStreak){ bestStreak = s; bestName = h.nome; }
-  });
-  const now = new Date();
-  const weekStart = periodStart('settimana', now).getTime();
-  const prevWeekStart = weekStart - 7*86400000;
-  let thisWeek = 0, lastWeek = 0;
-  Object.values(state.logs).forEach(arr=> arr.forEach(l=>{
-    const t = new Date(l.fatto_at).getTime();
-    if(t >= weekStart) thisWeek++;
-    else if(t >= prevWeekStart && t < weekStart) lastWeek++;
-  }));
-
-  // Mostriamo la card solo quando c'è qualcosa di genuinamente incoraggiante da dire.
-  // Uno streak di 1 giorno o "1 attività" non motivano nessuno: meglio tacere che essere fiacchi.
-  if(bestStreak < 2 && thisWeek < 2) return '';
-
-  let lines = [];
-  if(bestStreak >= 2){
-    lines.push(`🔥 ${bestStreak} giorni di fila su "${esc(bestName)}"`);
-  }
-  if(lastWeek > 0 && thisWeek !== lastWeek){
-    const verbo = thisWeek > lastWeek ? 'meglio' : 'un po\' più piano';
-    lines.push(`Questa settimana stai andando ${verbo} della precedente (${thisWeek} vs ${lastWeek} attività)`);
-  } else if(thisWeek >= 2){
-    lines.push(`${thisWeek} ${pluralWord(thisWeek,'attività registrata','attività registrate')} questa settimana`);
-  }
-  if(!lines.length) return '';
-  return `<div class="motivation-card"><h3>${lines[0]}</h3>${lines[1]?`<div class="small">${lines[1]}</div>`:''}</div>`;
-}
-
 function habitCard(h, draggable){
   const done = countInPeriod(h, h.target_periodo);
   const status = habitStatus(h);
   const pct = Math.min(100, Math.round(done / h.target_volte * 100));
   const last = lastLog(h.id);
-  const streak = computeStreak(h);
   const progressTxt = h.tipo==='quantita' ? `${fmtAmount(h,done)}/${fmtAmount(h,h.target_volte)}` : `${done}/${h.target_volte}`;
   const freqTxt = h.tipo==='quantita'
     ? `${fmtAmount(h,h.target_volte)} al ${PERIOD_LABEL[h.target_periodo]}`
@@ -613,7 +586,6 @@ function habitCard(h, draggable){
         <div class="habit-freq">${freqTxt}</div>
       </div>
       <div class="row" style="align-items:flex-start; gap:6px;">
-        ${streak>1 ? `<span class="chip streak">🔥 ${streak}g</span>` : ''}
         <span class="chip ${status}">${progressTxt}</span>
         <button class="kebab" onclick="openHabitMenu('${h.id}')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
