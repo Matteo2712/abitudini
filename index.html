@@ -16,13 +16,17 @@
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
 body{margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--text); padding-bottom:90px;}
-header{position:sticky; top:0; z-index:20; background:rgba(15,20,32,.92); backdrop-filter:blur(8px); padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;}
+.app-shell{max-width:600px; margin:0 auto;}
+header{position:sticky; top:0; z-index:20; background:rgba(15,20,32,.92); backdrop-filter:blur(8px); padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; max-width:600px; margin:0 auto;}
 header h1{font-size:18px; margin:0; font-weight:700; letter-spacing:.3px;}
 header h1 span{color:var(--accent);}
-.iconbtn{background:var(--card2); border:1px solid var(--border); color:var(--text); width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; cursor:pointer;}
-main{padding:14px 14px 20px; display:none;}
-.fab, .tabbar{display:none;}
+.user-chip{display:flex; align-items:center; gap:7px; cursor:pointer; font-size:12px; color:var(--muted); background:var(--card2); border:1px solid var(--border); padding:6px 10px; border-radius:20px; max-width:60vw;}
+.user-chip span.email{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.status-dot{width:8px; height:8px; border-radius:50%; flex-shrink:0; background:var(--danger);}
+.status-dot.online{background:var(--ok);}
+main{padding:14px 14px 20px; max-width:600px; margin:0 auto;}
 .tabbar{position:fixed; bottom:0; left:0; right:0; display:flex; background:var(--card); border-top:1px solid var(--border); z-index:30;}
+.tabbar-inner{display:flex; max-width:600px; margin:0 auto; width:100%;}
 .tabbar button{flex:1; background:none; border:none; color:var(--muted); padding:10px 0 8px; font-size:11px; display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer;}
 .tabbar button.active{color:var(--accent);}
 .tabbar svg{width:20px; height:20px;}
@@ -31,7 +35,6 @@ main{padding:14px 14px 20px; display:none;}
 .habit-top{display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
 .habit-name{font-size:16px; font-weight:600;}
 .habit-freq{font-size:12px; color:var(--muted); margin-top:2px;}
-.habit-actions{display:flex; gap:6px;}
 .chip{font-size:11px; padding:3px 9px; border-radius:20px; background:var(--card2); border:1px solid var(--border); color:var(--muted); white-space:nowrap;}
 .chip.ok{color:var(--ok); border-color:#1f6d4a;}
 .chip.warn{color:var(--warn); border-color:#7a5b12;}
@@ -44,20 +47,20 @@ main{padding:14px 14px 20px; display:none;}
 .btn{background:var(--accent); color:#06231f; border:none; border-radius:12px; padding:10px 14px; font-weight:700; font-size:14px; cursor:pointer;}
 .btn.secondary{background:var(--card2); color:var(--text); border:1px solid var(--border);}
 .btn.small{padding:7px 11px; font-size:12px; border-radius:10px;}
-.btn.ghost{background:none; border:1px solid var(--border); color:var(--muted);}
 .btn.danger{background:#3a1a1a; color:var(--danger); border:1px solid #5a2323;}
 .row{display:flex; gap:8px;}
 .row.wrap{flex-wrap:wrap;}
-.fab{position:fixed; bottom:78px; right:18px; width:56px; height:56px; border-radius:50%; background:var(--accent); color:#06231f; border:none; font-size:28px; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 20px rgba(45,212,191,.4); z-index:25; cursor:pointer;}
+.fab{position:fixed; bottom:78px; left:50%; transform:translateX(calc(300px - 74px)); width:56px; height:56px; border-radius:50%; background:var(--accent); color:#06231f; border:none; font-size:28px; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 20px rgba(45,212,191,.4); z-index:25; cursor:pointer;}
+@media (max-width:640px){ .fab{ left:auto; right:18px; transform:none; } }
 .modal-bg{position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:50; display:flex; align-items:flex-end; justify-content:center;}
 .modal-bg.center{align-items:center;}
-.modal{background:var(--card); border-radius:20px 20px 0 0; padding:20px; width:100%; max-width:480px; max-height:88vh; overflow-y:auto;}
+.modal{background:var(--card); border-radius:20px 20px 0 0; padding:20px; width:100%; max-width:420px; max-height:88vh; overflow-y:auto;}
 .modal-bg.center .modal{border-radius:18px;}
 .modal h2{margin:0 0 14px; font-size:17px;}
 label{display:block; font-size:12px; color:var(--muted); margin:12px 0 5px;}
 input,select{width:100%; background:var(--card2); border:1px solid var(--border); color:var(--text); padding:11px 12px; border-radius:10px; font-size:15px;}
 input[type=number]{width:90px;}
-.freq-row{display:flex; align-items:center; gap:8px;}
+.freq-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
 .modal-actions{display:flex; gap:10px; margin-top:20px;}
 .modal-actions .btn{flex:1;}
 .empty{text-align:center; padding:40px 20px; color:var(--muted);}
@@ -79,12 +82,14 @@ input[type=number]{width:90px;}
 .reminder-item{display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.06);}
 .reminder-item:last-child{border-bottom:none;}
 .section-title{font-size:13px; color:var(--muted); margin:18px 0 8px; text-transform:uppercase; letter-spacing:.5px;}
-#connStatus{position:fixed; top:8px; right:12px; font-size:10px; color:var(--muted); z-index:40;}
 .sort-row{display:flex; gap:6px; margin-bottom:12px; overflow-x:auto;}
 .sort-btn{background:var(--card2); border:1px solid var(--border); color:var(--muted); font-size:12px; padding:7px 12px; border-radius:20px; white-space:nowrap; cursor:pointer;}
 .sort-btn.active{color:var(--accent); border-color:var(--accent);}
-.reorder-arrows{display:flex; flex-direction:column; gap:2px;}
-.reorder-arrows button{background:var(--card2); border:1px solid var(--border); color:var(--muted); width:26px; height:22px; border-radius:6px; cursor:pointer; font-size:11px; line-height:1;}
+.grip{cursor:grab; color:var(--muted); padding:4px 6px; touch-action:none;}
+.grip svg{width:18px; height:18px;}
+.habit-card.dragging{opacity:.4;}
+.kebab{background:none; border:none; color:var(--muted); cursor:pointer; padding:4px 6px;}
+.kebab svg{width:20px; height:20px;}
 .motivation-card{background:linear-gradient(135deg,#241c0a,#1c1508); border:1px solid #4a3a12; border-radius:16px; padding:14px; margin-bottom:14px;}
 .motivation-card h3{margin:0 0 6px; font-size:14px; color:var(--warn);}
 .auth-screen{min-height:80vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; text-align:center;}
@@ -101,24 +106,18 @@ input[type=number]{width:90px;}
 
 <header>
   <h1>Abit<span>udini</span></h1>
-  <div class="row" style="gap:6px;">
-    <button class="iconbtn" onclick="openMenu()" title="Menu">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
-    </button>
-    <button class="iconbtn" onclick="requestNotifPermission()" title="Notifiche">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-    </button>
+  <div class="user-chip" id="userChip" onclick="openMenu()">
+    <span class="status-dot" id="statusDot"></span>
+    <span class="email" id="userEmail"></span>
   </div>
 </header>
 
-<div id="connStatus"></div>
-
 <div id="authGate"></div>
-<main id="main"></main>
+<div class="app-shell"><main id="main"></main></div>
 
 <button class="fab" onclick="openHabitModal()">+</button>
 
-<div class="tabbar">
+<div class="tabbar"><div class="tabbar-inner">
   <button class="tab-btn active" data-tab="oggi" onclick="switchTab('oggi')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
     Oggi
@@ -131,24 +130,26 @@ input[type=number]{width:90px;}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
     Storico
   </button>
-</div>
+</div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script>
 /* ============ CONFIG ============
    Stesso progetto Supabase di CaliMat / PesoDigiuno. */
-const SUPABASE_URL = 'https://edlvmkjctzhqoswpppds.supabase.co/';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkbHZta2pjdHpocW9zd3BwcGRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNjEyMDEsImV4cCI6MjA5NjczNzIwMX0.Oq0TyYWG4LotZhH57LQtklUdVho_kQ15KlSs8KGO2AM';
-
+const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR-ANON-KEY";
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* ============ SCHEMA (SQL da eseguire una volta su Supabase) ============
+/* ============ SCHEMA (SQL — esegui le ALTER se il progetto ha già le tabelle) ============
 create table abit_abitudini (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users default auth.uid(),
   nome text not null,
-  target_volte int not null default 1,
-  target_periodo text not null default 'giorno',
+  tipo text not null default 'checkbox',        -- checkbox | quantita
+  unita text,                                   -- solo per tipo 'quantita', es. 'km','litri','minuti','kcal'
+  target_volte numeric not null default 1,       -- n. volte (checkbox) oppure obiettivo quantità (quantita)
+  target_periodo text not null default 'giorno', -- giorno | settimana | mese | anno
   ordine int not null default 0,
   colore text default '#2dd4bf',
   archiviata boolean default false,
@@ -159,6 +160,7 @@ create table abit_abitudini_log (
   habit_id uuid references abit_abitudini(id) on delete cascade,
   user_id uuid references auth.users default auth.uid(),
   fatto_at timestamptz not null default now(),
+  valore numeric,                                -- solo per tipo 'quantita'
   nota text,
   created_at timestamptz default now()
 );
@@ -166,9 +168,15 @@ alter table abit_abitudini enable row level security;
 alter table abit_abitudini_log enable row level security;
 create policy "own rows" on abit_abitudini for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "own rows" on abit_abitudini_log for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- Se le tabelle esistono già senza queste colonne:
+-- alter table abit_abitudini add column if not exists tipo text not null default 'checkbox';
+-- alter table abit_abitudini add column if not exists unita text;
+-- alter table abit_abitudini_log add column if not exists valore numeric;
 =========================================================================== */
 
 const PERIOD_LABEL = {giorno:'giorno', settimana:'settimana', mese:'mese', anno:'anno'};
+const PENDING_KEY = 'ab_pending_sync';
 
 let state = {
   habits: [],
@@ -177,15 +185,29 @@ let state = {
   sortMode: localStorage.getItem('ab_sort') || 'personale',
   online: navigator.onLine,
   session: null,
+  dayStartHour: parseInt(localStorage.getItem('ab_day_start_hour') || '0'),
 };
-
-const PENDING_KEY = 'ab_pending_sync';
 
 function uid(){ return crypto.randomUUID ? crypto.randomUUID() : 'id-'+Date.now()+Math.random(); }
 
+/* ============ "FINE GIORNATA" PERSONALIZZATA ============
+   Se l'utente va a letto alle 3, la mezzanotte non è un confine di giornata
+   utile. Tutto ciò che riguarda "quale giorno è" (streak, grafico, periodo
+   giornaliero) viene calcolato spostando l'orologio indietro di dayStartHour
+   ore prima di leggere anno/mese/giorno. */
+function dayShiftMs(){ return state.dayStartHour * 3600000; }
+function shifted(d){ return new Date(d.getTime() - dayShiftMs()); }
+
 function localDateKey(d=new Date()){
-  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+  const sd = shifted(d);
+  const y=sd.getFullYear(), m=String(sd.getMonth()+1).padStart(2,'0'), day=String(sd.getDate()).padStart(2,'0');
   return `${y}-${m}-${day}`;
+}
+
+function setDayStartHour(h){
+  state.dayStartHour = h;
+  localStorage.setItem('ab_day_start_hour', String(h));
+  render();
 }
 
 function fmtAgo(dateStr){
@@ -206,16 +228,14 @@ function fmtDateTime(dateStr){
   return d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'2-digit'}) + ' ' + d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
 }
 
-/* ============ PERIODI DI CALENDARIO ============ */
+/* ============ PERIODI DI CALENDARIO (rispettano dayStartHour) ============ */
 function periodStart(periodo, ref=new Date()){
-  const d = new Date(ref);
-  if(periodo==='giorno'){ d.setHours(0,0,0,0); return d; }
-  if(periodo==='settimana'){
-    const day = (d.getDay()+6)%7;
-    d.setDate(d.getDate()-day); d.setHours(0,0,0,0); return d;
-  }
-  if(periodo==='mese'){ d.setDate(1); d.setHours(0,0,0,0); return d; }
-  if(periodo==='anno'){ d.setMonth(0,1); d.setHours(0,0,0,0); return d; }
+  const d = shifted(ref);
+  if(periodo==='giorno'){ d.setHours(0,0,0,0); }
+  else if(periodo==='settimana'){ const day=(d.getDay()+6)%7; d.setDate(d.getDate()-day); d.setHours(0,0,0,0); }
+  else if(periodo==='mese'){ d.setDate(1); d.setHours(0,0,0,0); }
+  else if(periodo==='anno'){ d.setMonth(0,1); d.setHours(0,0,0,0); }
+  return new Date(d.getTime() + dayShiftMs());
 }
 function periodEnd(periodo, start){
   const d = new Date(start);
@@ -226,57 +246,62 @@ function periodEnd(periodo, start){
   return d;
 }
 
-function countInPeriod(habitId, periodo){
-  const l = state.logs[habitId] || [];
+/* Per tipo 'checkbox' conta le occorrenze; per 'quantita' somma i valori registrati. */
+function countInPeriod(h, periodo){
+  const l = state.logs[h.id] || [];
   const start = periodStart(periodo).getTime();
-  return l.filter(x=> new Date(x.fatto_at).getTime() >= start).length;
+  const inRange = l.filter(x=> new Date(x.fatto_at).getTime() >= start);
+  if(h.tipo==='quantita') return inRange.reduce((s,x)=> s + (Number(x.valore)||0), 0);
+  return inRange.length;
 }
 
-/* Criterio "da fare oggi":
-   - giornaliere: finché non raggiungono il target del giorno
-   - settimanali/mensili/annuali: mostrate se si è indietro rispetto al ritmo
-     atteso in base alla frazione di periodo già trascorsa
-     (es. 2x/anno, se non fatta e siamo già a metà anno, compare come da fare) */
 function isDueToday(h){
-  const done = countInPeriod(h.id, h.target_periodo);
+  const done = countInPeriod(h, h.target_periodo);
   if(h.target_periodo==='giorno') return done < h.target_volte;
   const start = periodStart(h.target_periodo);
   const end = periodEnd(h.target_periodo, start);
   const elapsedFrac = (Date.now()-start.getTime())/(end.getTime()-start.getTime());
-  const expected = Math.ceil(h.target_volte * elapsedFrac);
+  const expected = h.tipo==='quantita' ? h.target_volte*elapsedFrac : Math.ceil(h.target_volte*elapsedFrac);
   return done < expected;
 }
 
 function habitStatus(h){
-  const done = countInPeriod(h.id, h.target_periodo);
+  const done = countInPeriod(h, h.target_periodo);
   const ratio = done / h.target_volte;
   if(ratio >= 1) return 'ok';
   return isDueToday(h) ? 'warn' : 'danger';
 }
 
-/* ============ STREAK (motivazione, calcolata solo dai log già presenti) ============ */
-function computeStreak(habitId){
-  const logs = state.logs[habitId] || [];
+function fmtAmount(h, n){
+  const num = h.tipo==='quantita' ? (Math.round(n*100)/100) : n;
+  return h.tipo==='quantita' ? `${num}${h.unita ? ' '+esc(h.unita) : ''}` : `${num}`;
+}
+
+/* ============ STREAK (calcolata solo dai log già presenti) ============ */
+function computeStreak(h){
+  const logs = state.logs[h.id] || [];
   if(!logs.length) return 0;
-  const daysWithLog = new Set(logs.map(l=> localDateKey(new Date(l.fatto_at))));
+  let daysOk;
+  if(h.tipo==='quantita'){
+    const perDay = {};
+    logs.forEach(l=>{ const k=localDateKey(new Date(l.fatto_at)); perDay[k]=(perDay[k]||0)+(Number(l.valore)||0); });
+    daysOk = new Set(Object.keys(perDay).filter(k=> perDay[k] >= h.target_volte));
+  } else {
+    daysOk = new Set(logs.map(l=> localDateKey(new Date(l.fatto_at))));
+  }
   let streak = 0;
   let cursor = new Date();
-  if(!daysWithLog.has(localDateKey(cursor))) cursor.setDate(cursor.getDate()-1);
-  while(daysWithLog.has(localDateKey(cursor))){
-    streak++;
-    cursor.setDate(cursor.getDate()-1);
-  }
+  if(!daysOk.has(localDateKey(cursor))) cursor.setDate(cursor.getDate()-1);
+  while(daysOk.has(localDateKey(cursor))){ streak++; cursor.setDate(cursor.getDate()-1); }
   return streak;
 }
 
-/* ============ AUTENTICAZIONE ============
-   Login email + password, come CaliMat/PesoDigiuno.
-   La password viene gestita interamente da Supabase Auth: mai salvata in
-   chiaro (hash bcrypt in auth.users), qui teniamo solo il token di sessione. */
-let authMode = 'login'; // login | signup
+/* ============ AUTENTICAZIONE (email + password, come CaliMat/PesoDigiuno) ============ */
+let authMode = 'login';
 
 function renderAuthScreen(){
-  document.getElementById('main').style.display = 'none';
+  document.querySelector('.app-shell').style.display = 'none';
+  document.getElementById('userChip').style.visibility = 'hidden';
   document.querySelector('.fab').style.display = 'none';
   document.querySelector('.tabbar').style.display = 'none';
   document.getElementById('authGate').innerHTML = `
@@ -299,11 +324,7 @@ function renderAuthScreen(){
       </div>
     </div>`;
 }
-
-function toggleAuthMode(){
-  authMode = authMode==='login' ? 'signup' : 'login';
-  renderAuthScreen();
-}
+function toggleAuthMode(){ authMode = authMode==='login' ? 'signup' : 'login'; renderAuthScreen(); }
 
 async function doLogin(){
   const email = document.getElementById('auth-email').value.trim();
@@ -314,12 +335,10 @@ async function doLogin(){
   try{
     const {error} = await sb.auth.signInWithPassword({ email, password });
     if(error) throw error;
-    // onAuthStateChange gestisce il resto
   }catch(err){
     msgEl.textContent = 'Errore: ' + (err.message === 'Invalid login credentials' ? 'email o password errati.' : err.message);
   }
 }
-
 async function doSignup(){
   const email = document.getElementById('auth-email').value.trim();
   const password = document.getElementById('auth-password').value;
@@ -330,17 +349,9 @@ async function doSignup(){
   try{
     const {data, error} = await sb.auth.signUp({ email, password });
     if(error) throw error;
-    if(data.session){
-      // conferma email disattivata sul progetto: sessione già attiva
-    } else {
-      msgEl.textContent = 'Account creato! Controlla la tua email per confermare, poi accedi.';
-      authMode = 'login';
-    }
-  }catch(err){
-    msgEl.textContent = 'Errore: ' + err.message;
-  }
+    if(!data.session){ msgEl.textContent = 'Account creato! Controlla la tua email per confermare, poi accedi.'; authMode='login'; }
+  }catch(err){ msgEl.textContent = 'Errore: ' + err.message; }
 }
-
 async function sendPasswordReset(){
   const email = document.getElementById('auth-email').value.trim();
   const msgEl = document.getElementById('auth-msg');
@@ -350,47 +361,48 @@ async function sendPasswordReset(){
     const {error} = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
     if(error) throw error;
     msgEl.textContent = 'Email di reset inviata, controlla la posta.';
-  }catch(err){
-    msgEl.textContent = 'Errore: ' + err.message;
-  }
+  }catch(err){ msgEl.textContent = 'Errore: ' + err.message; }
 }
-
 async function logout(){
   await sb.auth.signOut();
   state.habits = []; state.logs = {};
   closeModal();
 }
-
 function showApp(){
   document.getElementById('authGate').innerHTML = '';
-  document.getElementById('main').style.display = 'block';
+  document.querySelector('.app-shell').style.display = 'block';
+  document.getElementById('userChip').style.visibility = 'visible';
   document.querySelector('.fab').style.display = 'flex';
   document.querySelector('.tabbar').style.display = 'flex';
+  document.getElementById('userEmail').textContent = state.session?.user?.email || '';
 }
-
 sb.auth.onAuthStateChange((event, session)=>{
   state.session = session;
-  if(session){
-    showApp();
-    loadAll().then(()=> checkDailyReminder(false));
-  } else {
-    renderAuthScreen();
-  }
+  if(session){ showApp(); loadAll().then(()=> checkDailyReminder(false)); }
+  else{ renderAuthScreen(); }
 });
 
-/* ============ MENU (logout, esporta, importa) ============ */
+/* ============ MENU (impostazioni, notifiche, esporta/importa, logout) ============ */
 function openMenu(){
   const email = state.session?.user?.email || '';
   showModal(`
     <h2>Menu</h2>
     <div class="small" style="margin-bottom:8px;">${esc(email)}</div>
-    <div class="menu-item" onclick="closeModal(); exportData()">
+    <div class="menu-item" onclick="closeModal(); openSettings()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      Impostazioni
+    </div>
+    <div class="menu-item" onclick="closeModal(); requestNotifPermission()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      Notifiche
+    </div>
+    <div class="menu-item" onclick="closeModal(); exportCSV()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
-      Esporta dati (backup JSON)
+      Esporta dati (CSV)
     </div>
     <div class="menu-item" onclick="closeModal(); triggerImport()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21V9"/><path d="M7 14l5-5 5 5"/><path d="M5 3h14"/></svg>
-      Importa dati da backup
+      Importa dati da CSV
     </div>
     <div class="menu-item danger" onclick="closeModal(); confirmLogout()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
@@ -399,89 +411,104 @@ function openMenu(){
     <div class="modal-actions"><button class="btn secondary" onclick="closeModal()" style="flex:1">Chiudi</button></div>
   `, true);
 }
-
 function confirmLogout(){
   showModal(`
     <h2>Uscire dall'account?</h2>
-    <div class="small">Dovrai richiedere un nuovo link via email per accedere di nuovo.</div>
+    <div class="small">Dovrai rifare login con email e password.</div>
     <div class="modal-actions">
       <button class="btn secondary" onclick="closeModal()">Annulla</button>
       <button class="btn danger" onclick="logout()">Esci</button>
     </div>
   `, true);
 }
+function openSettings(){
+  showModal(`
+    <h2>Impostazioni</h2>
+    <label>Fine giornata</label>
+    <div class="small" style="margin-bottom:6px;">Se vai a letto tardi, imposta qui l'orario oltre il quale un'attività fatta "dopo mezzanotte" conta ancora come giorno precedente.</div>
+    <select id="set-dayhour">
+      ${Array.from({length:24},(_,h)=>`<option value="${h}" ${state.dayStartHour===h?'selected':''}>${h===0?'Mezzanotte (00:00)':'Ore '+String(h).padStart(2,'0')+':00'}</option>`).join('')}
+    </select>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Annulla</button>
+      <button class="btn" onclick="setDayStartHour(parseInt(document.getElementById('set-dayhour').value)); closeModal();">Salva</button>
+    </div>
+  `, true);
+}
 
-/* ============ ESPORTA / IMPORTA (backup JSON completo) ============ */
-function exportData(){
-  const payload = {
-    exported_at: new Date().toISOString(),
-    app: 'abitudini',
-    habits: state.habits,
-    logs: Object.values(state.logs).flat(),
-  };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+/* ============ ESPORTA / IMPORTA (CSV) ============ */
+function exportCSV(){
+  const rows = [];
+  state.habits.forEach(h=> rows.push({
+    tipo_record:'abitudine', id:h.id, habit_id:'', nome:h.nome, tipo:h.tipo||'checkbox',
+    target_volte:h.target_volte, target_periodo:h.target_periodo, unita:h.unita||'', ordine:h.ordine||0,
+    fatto_at:'', valore:'', nota:''
+  }));
+  Object.values(state.logs).flat().forEach(l=> rows.push({
+    tipo_record:'log', id:l.id, habit_id:l.habit_id, nome:'', tipo:'', target_volte:'', target_periodo:'',
+    unita:'', ordine:'', fatto_at:l.fatto_at, valore:l.valore ?? '', nota:l.nota || ''
+  }));
+  const csv = Papa.unparse(rows);
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = `abitudini-backup-${localDateKey()}.json`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+  a.href = url; a.download = `abitudini-backup-${localDateKey()}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
   URL.revokeObjectURL(url);
 }
 
 function triggerImport(){
   const input = document.createElement('input');
-  input.type = 'file'; input.accept = 'application/json';
-  input.onchange = async (e)=>{
+  input.type = 'file'; input.accept = '.csv,text/csv';
+  input.onchange = (e)=>{
     const file = e.target.files[0];
     if(!file) return;
-    try{
-      const text = await file.text();
-      const data = JSON.parse(text);
-      if(!data.habits || !data.logs) throw new Error('Formato file non valido');
-      await confirmImport(data);
-    }catch(err){
-      alert('Errore durante la lettura del file: ' + err.message);
-    }
+    Papa.parse(file, { header:true, skipEmptyLines:true, complete:(res)=>{
+      const habitsRows = res.data.filter(r=> r.tipo_record==='abitudine');
+      const logRows = res.data.filter(r=> r.tipo_record==='log');
+      if(!habitsRows.length && !logRows.length){ alert('File CSV non riconosciuto: mancano le colonne attese.'); return; }
+      confirmImport(habitsRows, logRows);
+    }, error:(err)=> alert('Errore lettura CSV: '+err.message) });
   };
   input.click();
 }
 
-async function confirmImport(data){
+function confirmImport(habitsRows, logRows){
   showModal(`
     <h2>Importare il backup?</h2>
-    <div class="small">Trovate ${data.habits.length} abitudini e ${data.logs.length} registrazioni.
+    <div class="small">Trovate ${habitsRows.length} abitudini e ${logRows.length} registrazioni.
     Verranno aggiunte come nuove voci (non sovrascrivono quelle esistenti).</div>
     <div class="modal-actions">
       <button class="btn secondary" onclick="closeModal()">Annulla</button>
       <button class="btn" onclick="doImport()">Importa</button>
     </div>
   `, true);
-  window._pendingImport = data;
+  window._pendingImport = {habitsRows, logRows};
 }
 
 async function doImport(){
-  const data = window._pendingImport;
+  const {habitsRows, logRows} = window._pendingImport || {habitsRows:[],logRows:[]};
   closeModal();
-  if(!data) return;
   const idMap = {};
-  const maxOrdine = state.habits.reduce((m,h)=> Math.max(m, h.ordine||0), 0);
-  let i = 1;
-  for(const h of data.habits){
+  let maxOrdine = state.habits.reduce((m,h)=> Math.max(m, h.ordine||0), 0);
+  for(const r of habitsRows){
     const newId = uid();
-    idMap[h.id] = newId;
-    const entry = {id:newId, nome:h.nome, target_volte:h.target_volte, target_periodo:h.target_periodo, ordine:maxOrdine+i, archiviata:false};
-    i++;
+    idMap[r.id] = newId;
+    maxOrdine++;
+    const entry = {
+      id:newId, nome:r.nome, tipo:r.tipo||'checkbox', unita:r.unita||null,
+      target_volte:parseFloat(r.target_volte)||1, target_periodo:r.target_periodo||'giorno',
+      ordine:maxOrdine, archiviata:false
+    };
     state.habits.push({...entry, created_at:new Date().toISOString()});
     state.logs[newId] = [];
     try{ await sb.from('abit_abitudini').insert(entry); }
     catch(err){ queuePending('insert_habit', entry); }
   }
-  for(const l of data.logs){
-    const habitId = idMap[l.habit_id];
+  for(const r of logRows){
+    const habitId = idMap[r.habit_id];
     if(!habitId) continue;
-    const entry = {id: uid(), habit_id: habitId, fatto_at: l.fatto_at, nota: l.nota || null};
+    const entry = {id: uid(), habit_id: habitId, fatto_at: r.fatto_at, valore: r.valore? parseFloat(r.valore) : null, nota: r.nota || null};
     state.logs[habitId].push(entry);
     try{ await sb.from('abit_abitudini_log').insert(entry); }
     catch(err){ queuePending('insert_log', entry); }
@@ -494,27 +521,36 @@ async function doImport(){
 /* ============ DATA LOAD ============ */
 async function loadAll(){
   try{
-    const {data: habits, error:e1} = await sb.from('abit_abitudini').select('*').eq('archiviata', false).order('ordine',{ascending:true});
+    const {data: habits, error:e1} = await sb.from('abit_abitudini').select('*').eq('archiviata', false)
+      .order('ordine',{ascending:true}).order('created_at',{ascending:true});
     if(e1) throw e1;
     state.habits = habits || [];
+    // fix: se l'ordine è duplicato/azzerato (es. dopo un caricamento manuale in DB), lo normalizziamo una volta
+    const ordini = state.habits.map(h=>h.ordine||0);
+    const hasDup = new Set(ordini).size < ordini.length;
+    if(hasDup && state.habits.length){
+      state.habits.forEach((h,i)=>{ h.ordine = i; });
+      persistOrdineBulk(state.habits);
+    }
     const {data: logs, error:e2} = await sb.from('abit_abitudini_log').select('*').order('fatto_at',{ascending:false});
     if(e2) throw e2;
     state.logs = {};
-    (logs||[]).forEach(l=>{
-      (state.logs[l.habit_id] = state.logs[l.habit_id] || []).push(l);
-    });
+    (logs||[]).forEach(l=>{ (state.logs[l.habit_id] = state.logs[l.habit_id] || []).push(l); });
     setConn(true);
-  }catch(err){
-    console.error(err);
-    setConn(false);
-  }
+  }catch(err){ console.error(err); setConn(false); }
   render();
+}
+async function persistOrdineBulk(habits){
+  for(const h of habits){
+    try{ await sb.from('abit_abitudini').update({ordine:h.ordine}).eq('id', h.id); }
+    catch(err){ queuePending('update_habit', {id:h.id, ordine:h.ordine}); }
+  }
 }
 
 function setConn(ok){
   state.online = ok;
-  const el = document.getElementById('connStatus');
-  el.innerHTML = ok ? '' : '<span style="color:var(--danger)">● offline</span>';
+  const dot = document.getElementById('statusDot');
+  if(dot) dot.classList.toggle('online', ok);
 }
 
 /* ============ RENDER ============ */
@@ -523,36 +559,34 @@ function switchTab(t){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===t));
   render();
 }
-
 function render(){
   const main = document.getElementById('main');
+  if(!main) return;
   if(state.tab==='oggi') main.innerHTML = renderOggi();
   else if(state.tab==='abitudini') main.innerHTML = renderAbitudini();
   else main.innerHTML = renderStorico();
+  if(state.tab==='abitudini' && state.sortMode==='personale') attachDragHandlers();
 }
+function lastLog(habitId){ const l = state.logs[habitId]; return l && l.length ? l[0] : null; }
 
-function lastLog(habitId){
-  const l = state.logs[habitId];
-  return l && l.length ? l[0] : null;
-}
+function pluralWord(n, sing, plur){ return n===1 ? sing : plur; }
 
-/* TAB "OGGI": SOLO le abitudini da fare oggi (niente elenco completo qui) */
+/* TAB "OGGI": solo il riepilogo da fare oggi + motivazione */
 function renderOggi(){
   if(!state.habits.length) return emptyState();
   const due = state.habits.filter(isDueToday);
-
   let html = motivationCard();
-
   html += `<div class="reminder-banner"><h3>📋 Da fare oggi</h3>`;
   if(!due.length){
     html += `<div class="reminder-item"><span class="small">Tutto fatto per oggi 🎉</span></div>`;
   } else {
     due.forEach(h=>{
-      const done = countInPeriod(h.id, h.target_periodo);
+      const done = countInPeriod(h, h.target_periodo);
       const periodoLbl = h.target_periodo==='giorno' ? '' : ` <span class="small">(${PERIOD_LABEL[h.target_periodo]})</span>`;
+      const progressTxt = h.tipo==='quantita' ? `${fmtAmount(h,done)}/${fmtAmount(h,h.target_volte)}` : `${done}/${h.target_volte}`;
       html += `<div class="reminder-item">
-        <span>${esc(h.nome)}${periodoLbl} <span class="small">${done}/${h.target_volte}</span></span>
-        <button class="btn small" onclick="quickLog('${h.id}')">Fatto ✓</button>
+        <span>${esc(h.nome)}${periodoLbl} <span class="small">${progressTxt}</span></span>
+        <button class="btn small" onclick="${h.tipo==='quantita'?`openQuickQty('${h.id}')`:`quickLog('${h.id}')`}">${h.tipo==='quantita'?'Registra':'Fatto ✓'}</button>
       </div>`;
     });
   }
@@ -563,10 +597,9 @@ function renderOggi(){
 function motivationCard(){
   let bestStreak = 0, bestName = '';
   state.habits.forEach(h=>{
-    const s = computeStreak(h.id);
+    const s = computeStreak(h);
     if(s > bestStreak){ bestStreak = s; bestName = h.nome; }
   });
-
   const now = new Date();
   const weekStart = periodStart('settimana', now).getTime();
   const prevWeekStart = weekStart - 7*86400000;
@@ -577,42 +610,47 @@ function motivationCard(){
     else if(t >= prevWeekStart && t < weekStart) lastWeek++;
   }));
 
-  if(!bestStreak && !thisWeek) return '';
+  // Mostriamo la card solo quando c'è qualcosa di genuinamente incoraggiante da dire.
+  // Uno streak di 1 giorno o "1 attività" non motivano nessuno: meglio tacere che essere fiacchi.
+  if(bestStreak < 2 && thisWeek < 2) return '';
 
-  let trendMsg = '';
-  if(lastWeek>0){
-    if(thisWeek > lastWeek) trendMsg = `Stai andando meglio della settimana scorsa (${thisWeek} vs ${lastWeek}) 💪`;
-    else if(thisWeek < lastWeek) trendMsg = `Questa settimana sei un po' più indietro rispetto alla precedente (${thisWeek} vs ${lastWeek})`;
-    else trendMsg = `Stesso ritmo della settimana scorsa (${thisWeek} attività)`;
-  } else if(thisWeek>0){
-    trendMsg = `${thisWeek} attività registrate questa settimana`;
+  let lines = [];
+  if(bestStreak >= 2){
+    lines.push(`🔥 ${bestStreak} giorni di fila su "${esc(bestName)}"`);
   }
-
-  return `<div class="motivation-card">
-    <h3>🔥 ${bestStreak>0 ? `${bestStreak} giorni di fila su "${esc(bestName)}"` : 'Continua così'}</h3>
-    <div class="small">${trendMsg}</div>
-  </div>`;
+  if(lastWeek > 0 && thisWeek !== lastWeek){
+    const verbo = thisWeek > lastWeek ? 'meglio' : 'un po\' più piano';
+    lines.push(`Questa settimana stai andando ${verbo} della precedente (${thisWeek} vs ${lastWeek} attività)`);
+  } else if(thisWeek >= 2){
+    lines.push(`${thisWeek} ${pluralWord(thisWeek,'attività registrata','attività registrate')} questa settimana`);
+  }
+  if(!lines.length) return '';
+  return `<div class="motivation-card"><h3>${lines[0]}</h3>${lines[1]?`<div class="small">${lines[1]}</div>`:''}</div>`;
 }
 
-function habitCard(h, showReorder){
-  const done = countInPeriod(h.id, h.target_periodo);
+function habitCard(h, draggable){
+  const done = countInPeriod(h, h.target_periodo);
   const status = habitStatus(h);
   const pct = Math.min(100, Math.round(done / h.target_volte * 100));
   const last = lastLog(h.id);
-  const streak = computeStreak(h.id);
-  return `<div class="card habit-card">
+  const streak = computeStreak(h);
+  const progressTxt = h.tipo==='quantita' ? `${fmtAmount(h,done)}/${fmtAmount(h,h.target_volte)}` : `${done}/${h.target_volte}`;
+  const freqTxt = h.tipo==='quantita'
+    ? `${fmtAmount(h,h.target_volte)} al ${PERIOD_LABEL[h.target_periodo]}`
+    : `${h.target_volte}× al ${PERIOD_LABEL[h.target_periodo]}`;
+  return `<div class="card habit-card" data-id="${h.id}" ${draggable?'draggable="true"':''}>
     <div class="habit-top">
+      ${draggable?`<div class="grip"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="8" cy="6" r="1.6"/><circle cx="8" cy="12" r="1.6"/><circle cx="8" cy="18" r="1.6"/><circle cx="16" cy="6" r="1.6"/><circle cx="16" cy="12" r="1.6"/><circle cx="16" cy="18" r="1.6"/></svg></div>`:''}
       <div style="flex:1">
         <div class="habit-name">${esc(h.nome)}</div>
-        <div class="habit-freq">${h.target_volte}× al ${PERIOD_LABEL[h.target_periodo]}</div>
+        <div class="habit-freq">${freqTxt}</div>
       </div>
       <div class="row" style="align-items:flex-start; gap:6px;">
         ${streak>1 ? `<span class="chip streak">🔥 ${streak}g</span>` : ''}
-        <span class="chip ${status}">${done}/${h.target_volte}</span>
-        ${showReorder ? `<div class="reorder-arrows">
-          <button onclick="moveHabit('${h.id}',-1)">▲</button>
-          <button onclick="moveHabit('${h.id}',1)">▼</button>
-        </div>` : ''}
+        <span class="chip ${status}">${progressTxt}</span>
+        <button class="kebab" onclick="openHabitMenu('${h.id}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+        </button>
       </div>
     </div>
     <div class="progress-row">
@@ -620,18 +658,25 @@ function habitCard(h, showReorder){
     </div>
     <div class="row" style="justify-content:space-between; align-items:center;">
       <span class="small">Ultima: ${fmtAgo(last?.fatto_at)}</span>
-      <div class="habit-actions">
-        <button class="btn small secondary" onclick="openManualLog('${h.id}')">＋ manuale</button>
-        <button class="btn small" onclick="quickLog('${h.id}')">Fatto ✓</button>
+      <div class="row">
+        ${h.tipo==='quantita'
+          ? `<button class="btn small" onclick="openQuickQty('${h.id}')">＋ registra</button>`
+          : `<button class="btn small secondary" onclick="openManualLog('${h.id}')">＋ manuale</button>
+             <button class="btn small" onclick="quickLog('${h.id}')">Fatto ✓</button>`}
       </div>
-    </div>
-    <div class="row wrap" style="margin-top:2px;">
-      <button class="btn small secondary" onclick="openHabitModal('${h.id}')">✏️ Modifica</button>
-      <button class="btn small secondary" onclick="showHistory('${h.id}')">🕘 Storico</button>
-      <button class="btn small danger" onclick="deleteHabit('${h.id}')">🗑 Elimina</button>
     </div>
     ${renderChart(h)}
   </div>`;
+}
+
+function openHabitMenu(habitId){
+  showModal(`
+    <h2>Abitudine</h2>
+    <div class="menu-item" onclick="closeModal(); openHabitModal('${habitId}')">✏️ Modifica</div>
+    <div class="menu-item" onclick="closeModal(); showHistory('${habitId}')">🕘 Storico</div>
+    <div class="menu-item danger" onclick="closeModal(); deleteHabit('${habitId}')">🗑 Elimina</div>
+    <div class="modal-actions"><button class="btn secondary" style="flex:1" onclick="closeModal()">Chiudi</button></div>
+  `, true);
 }
 
 function sortedHabits(){
@@ -645,35 +690,57 @@ function sortedHabits(){
   }
   return arr;
 }
+function setSortMode(mode){ state.sortMode = mode; localStorage.setItem('ab_sort', mode); render(); }
 
-function setSortMode(mode){
-  state.sortMode = mode;
-  localStorage.setItem('ab_sort', mode);
-  render();
-}
-
-/* TAB "ABITUDINI": elenco completo con grafico, ordinamento, modifica/elimina */
+/* TAB "ABITUDINI": elenco completo, ordinamento, drag & drop in modalità personale */
 function renderAbitudini(){
   if(!state.habits.length) return emptyState();
   const modes = [['personale','Personale'],['alfabetico','Alfabetico'],['frequenza','Frequenza']];
   let html = `<div class="sort-row">${modes.map(([k,l])=>
     `<button class="sort-btn ${state.sortMode===k?'active':''}" onclick="setSortMode('${k}')">${l}</button>`
   ).join('')}</div>`;
-  const list = sortedHabits();
-  html += list.map(h=> habitCard(h, state.sortMode==='personale')).join('');
+  const draggable = state.sortMode==='personale';
+  if(draggable) html += `<div class="small" style="margin-bottom:8px;">Trascina l'icona ⠿ per riordinare.</div>`;
+  html += `<div id="habitList">` + sortedHabits().map(h=> habitCard(h, draggable)).join('') + `</div>`;
   return html;
+}
+
+let dragFromId = null;
+function attachDragHandlers(){
+  const list = document.getElementById('habitList');
+  if(!list) return;
+  list.querySelectorAll('.habit-card[draggable="true"]').forEach(card=>{
+    card.addEventListener('dragstart', ()=>{ dragFromId = card.dataset.id; card.classList.add('dragging'); });
+    card.addEventListener('dragend', ()=>{ card.classList.remove('dragging'); });
+    card.addEventListener('dragover', (e)=> e.preventDefault());
+    card.addEventListener('drop', (e)=>{
+      e.preventDefault();
+      const toId = card.dataset.id;
+      if(!dragFromId || dragFromId===toId) return;
+      reorderHabits(dragFromId, toId);
+    });
+  });
+}
+async function reorderHabits(fromId, toId){
+  const list = sortedHabits();
+  const fromIdx = list.findIndex(h=>h.id===fromId);
+  const toIdx = list.findIndex(h=>h.id===toId);
+  if(fromIdx===-1 || toIdx===-1) return;
+  const [moved] = list.splice(fromIdx,1);
+  list.splice(toIdx,0,moved);
+  list.forEach((h,i)=> h.ordine = i);
+  render();
+  await persistOrdineBulk(list);
 }
 
 function renderChart(h){
   const days = [];
-  for(let i=13;i>=0;i--){
-    const d = new Date(); d.setDate(d.getDate()-i);
-    days.push(d);
-  }
+  for(let i=13;i>=0;i--){ const d = new Date(); d.setDate(d.getDate()-i); days.push(d); }
   const logs = state.logs[h.id] || [];
   const counts = days.map(d=>{
     const key = localDateKey(d);
-    return logs.filter(l=> localDateKey(new Date(l.fatto_at))===key).length;
+    const dayLogs = logs.filter(l=> localDateKey(new Date(l.fatto_at))===key);
+    return h.tipo==='quantita' ? dayLogs.reduce((s,l)=> s+(Number(l.valore)||0),0) : dayLogs.length;
   });
   const max = Math.max(1, ...counts);
   const bars = days.map((d,i)=>{
@@ -687,35 +754,16 @@ function renderChart(h){
   return `<div class="chart-wrap"><div class="bars">${bars}</div></div>`;
 }
 
-async function moveHabit(habitId, dir){
-  const list = sortedHabits();
-  const idx = list.findIndex(h=>h.id===habitId);
-  const swapIdx = idx+dir;
-  if(swapIdx<0 || swapIdx>=list.length) return;
-  const a = list[idx], b = list[swapIdx];
-  const tmp = a.ordine; a.ordine = b.ordine; b.ordine = tmp;
-  render();
-  try{
-    await sb.from('abit_abitudini').update({ordine:a.ordine}).eq('id', a.id);
-    await sb.from('abit_abitudini').update({ordine:b.ordine}).eq('id', b.id);
-  }catch(err){
-    queuePending('update_habit', {id:a.id, ordine:a.ordine});
-    queuePending('update_habit', {id:b.id, ordine:b.ordine});
-  }
-}
-
-/* TAB "STORICO": solo elenco cronologico dei log, distinto dalla tab Abitudini */
+/* TAB "STORICO": solo elenco cronologico grezzo dei log */
 function renderStorico(){
   const allLogs = [];
-  state.habits.forEach(h=>{
-    (state.logs[h.id]||[]).forEach(l=> allLogs.push({...l, habitName:h.nome}));
-  });
+  state.habits.forEach(h=>{ (state.logs[h.id]||[]).forEach(l=> allLogs.push({...l, habitName:h.nome, unita:h.unita, tipo:h.tipo})); });
   allLogs.sort((a,b)=> new Date(b.fatto_at) - new Date(a.fatto_at));
   if(!allLogs.length) return emptyState('Nessuna attività registrata ancora.');
   return `<div class="card">` + allLogs.map(l=>`
     <div class="history-item">
       <div>
-        <div>${esc(l.habitName)}</div>
+        <div>${esc(l.habitName)}${l.tipo==='quantita' && l.valore!=null ? ` — ${l.valore}${l.unita?' '+esc(l.unita):''}` : ''}</div>
         <div class="small">${fmtDateTime(l.fatto_at)}${l.nota?' · '+esc(l.nota):''}</div>
       </div>
       <button class="del" onclick="deleteLog('${l.id}','${l.habit_id}')">
@@ -730,12 +778,11 @@ function emptyState(msg){
     <div>${msg || 'Nessuna abitudine ancora. Tocca + per crearne una.'}</div>
   </div>`;
 }
-
-function esc(s){ return (s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
 /* ============ ACTIONS ============ */
 async function quickLog(habitId){
-  const entry = {id: uid(), habit_id: habitId, fatto_at: new Date().toISOString(), nota:null};
+  const entry = {id: uid(), habit_id: habitId, fatto_at: new Date().toISOString(), valore:null, nota:null};
   state.logs[habitId] = state.logs[habitId] || [];
   state.logs[habitId].unshift(entry);
   render();
@@ -743,6 +790,31 @@ async function quickLog(habitId){
     const {error} = await sb.from('abit_abitudini_log').insert({id:entry.id, habit_id:habitId, fatto_at:entry.fatto_at});
     if(error) throw error;
     setConn(true);
+  }catch(err){ queuePending('insert_log', entry); setConn(false); }
+}
+
+function openQuickQty(habitId){
+  const h = state.habits.find(x=>x.id===habitId);
+  showModal(`
+    <h2>Registra — ${esc(h.nome)}</h2>
+    <label>Quantità${h.unita?` (${esc(h.unita)})`:''}</label>
+    <input type="number" id="qty-value" step="0.01" min="0" placeholder="es. 1.5" autofocus>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Annulla</button>
+      <button class="btn" onclick="saveQuickQty('${habitId}')">Salva</button>
+    </div>
+  `, true);
+}
+async function saveQuickQty(habitId){
+  const val = parseFloat(document.getElementById('qty-value').value);
+  if(isNaN(val) || val<0){ alert('Inserisci un valore valido.'); return; }
+  const entry = {id: uid(), habit_id: habitId, fatto_at: new Date().toISOString(), valore: val, nota:null};
+  state.logs[habitId] = state.logs[habitId] || [];
+  state.logs[habitId].unshift(entry);
+  closeModal(); render();
+  try{
+    const {error} = await sb.from('abit_abitudini_log').insert(entry);
+    if(error) throw error;
   }catch(err){ queuePending('insert_log', entry); setConn(false); }
 }
 
@@ -758,6 +830,7 @@ function openManualLog(habitId){
     <input type="date" id="ml-date" value="${dateVal}">
     <label>Ora</label>
     <input type="time" id="ml-time" value="${timeVal}">
+    ${h.tipo==='quantita' ? `<label>Quantità${h.unita?` (${esc(h.unita)})`:''}</label><input type="number" id="ml-valore" step="0.01" min="0">` : ''}
     <label>Nota (opzionale)</label>
     <input type="text" id="ml-nota" placeholder="es. dopo cena">
     <div class="modal-actions">
@@ -766,19 +839,21 @@ function openManualLog(habitId){
     </div>
   `);
 }
-
 async function saveManualLog(habitId){
+  const h = state.habits.find(x=>x.id===habitId);
   const date = document.getElementById('ml-date').value;
   const time = document.getElementById('ml-time').value || '00:00';
   const nota = document.getElementById('ml-nota').value.trim();
+  const valEl = document.getElementById('ml-valore');
+  const valore = valEl ? parseFloat(valEl.value) : null;
   const fatto_at = new Date(`${date}T${time}:00`).toISOString();
-  const entry = {id: uid(), habit_id: habitId, fatto_at, nota: nota || null};
+  const entry = {id: uid(), habit_id: habitId, fatto_at, valore: isNaN(valore)?null:valore, nota: nota || null};
   state.logs[habitId] = state.logs[habitId] || [];
   state.logs[habitId].push(entry);
   state.logs[habitId].sort((a,b)=> new Date(b.fatto_at)-new Date(a.fatto_at));
   closeModal(); render();
   try{
-    const {error} = await sb.from('abit_abitudini_log').insert({id:entry.id, habit_id:habitId, fatto_at, nota: entry.nota});
+    const {error} = await sb.from('abit_abitudini_log').insert(entry);
     if(error) throw error;
   }catch(err){ queuePending('insert_log', entry); setConn(false); }
 }
@@ -789,15 +864,11 @@ function deleteLog(logId, habitId){
   if(idx===-1) return;
   const removed = arr.splice(idx,1)[0];
   render();
-  showUndoToast('Registrazione eliminata', async ()=>{
-    arr.splice(idx,0,removed);
-    render();
-  }, async ()=>{
+  showUndoToast('Registrazione eliminata', ()=>{ arr.splice(idx,0,removed); render(); }, async ()=>{
     try{ await sb.from('abit_abitudini_log').delete().eq('id', logId); }
     catch(err){ queuePending('delete_log', {id:logId}); }
   });
 }
-
 function deleteHabit(habitId){
   const idx = state.habits.findIndex(h=>h.id===habitId);
   if(idx===-1) return;
@@ -815,16 +886,32 @@ function deleteHabit(habitId){
   });
 }
 
+function toggleQtyFields(){
+  const tipo = document.getElementById('h-tipo').value;
+  document.getElementById('qty-fields').style.display = tipo==='quantita' ? 'block' : 'none';
+  document.getElementById('h-volte-unit-label').textContent = tipo==='quantita' ? 'al' : 'volte al';
+}
+
 function openHabitModal(habitId){
   const h = habitId ? state.habits.find(x=>x.id===habitId) : null;
+  const tipo = h?.tipo || 'checkbox';
   showModal(`
     <h2>${h?'Modifica abitudine':'Nuova abitudine'}</h2>
     <label>Nome</label>
     <input type="text" id="h-nome" value="${h?esc(h.nome):''}" placeholder="es. Studiare fagotto">
-    <label>Frequenza desiderata</label>
+    <label>Tipo</label>
+    <select id="h-tipo" onchange="toggleQtyFields()">
+      <option value="checkbox" ${tipo==='checkbox'?'selected':''}>Fatto / non fatto</option>
+      <option value="quantita" ${tipo==='quantita'?'selected':''}>Quantità (es. km, litri, minuti...)</option>
+    </select>
+    <div id="qty-fields" style="display:${tipo==='quantita'?'block':'none'}">
+      <label>Unità di misura</label>
+      <input type="text" id="h-unita" value="${h?esc(h.unita||''):''}" placeholder="es. km, litri, minuti, kcal">
+    </div>
+    <label>Obiettivo</label>
     <div class="freq-row">
-      <input type="number" id="h-volte" min="1" value="${h?h.target_volte:1}">
-      <span class="small">volte al</span>
+      <input type="number" id="h-volte" min="0.01" step="0.01" value="${h?h.target_volte:1}">
+      <span class="small" id="h-volte-unit-label">${tipo==='quantita'?'al':'volte al'}</span>
       <select id="h-periodo">
         ${Object.keys(PERIOD_LABEL).map(p=>`<option value="${p}" ${h&&h.target_periodo===p?'selected':''}>${PERIOD_LABEL[p]}</option>`).join('')}
       </select>
@@ -835,26 +922,27 @@ function openHabitModal(habitId){
     </div>
   `, true);
 }
-
 async function saveHabit(habitId){
   const nome = document.getElementById('h-nome').value.trim();
-  const volte = parseInt(document.getElementById('h-volte').value) || 1;
+  const tipo = document.getElementById('h-tipo').value;
+  const unita = tipo==='quantita' ? document.getElementById('h-unita').value.trim() : null;
+  const volte = parseFloat(document.getElementById('h-volte').value) || 1;
   const periodo = document.getElementById('h-periodo').value;
   if(!nome){ alert('Inserisci un nome'); return; }
   closeModal();
   if(habitId){
     const h = state.habits.find(x=>x.id===habitId);
-    h.nome = nome; h.target_volte = volte; h.target_periodo = periodo;
+    h.nome = nome; h.tipo = tipo; h.unita = unita; h.target_volte = volte; h.target_periodo = periodo;
     render();
-    try{ await sb.from('abit_abitudini').update({nome, target_volte:volte, target_periodo:periodo}).eq('id', habitId); }
-    catch(err){ queuePending('update_habit', {id:habitId, nome, target_volte:volte, target_periodo:periodo}); }
+    try{ await sb.from('abit_abitudini').update({nome, tipo, unita, target_volte:volte, target_periodo:periodo}).eq('id', habitId); }
+    catch(err){ queuePending('update_habit', {id:habitId, nome, tipo, unita, target_volte:volte, target_periodo:periodo}); }
   } else {
     const maxOrdine = state.habits.reduce((m,h)=> Math.max(m, h.ordine||0), 0);
-    const entry = {id: uid(), nome, target_volte:volte, target_periodo:periodo, ordine:maxOrdine+1, archiviata:false, created_at:new Date().toISOString()};
+    const entry = {id: uid(), nome, tipo, unita, target_volte:volte, target_periodo:periodo, ordine:maxOrdine+1, archiviata:false, created_at:new Date().toISOString()};
     state.habits.push(entry);
     state.logs[entry.id] = [];
     render();
-    try{ await sb.from('abit_abitudini').insert({id:entry.id, nome, target_volte:volte, target_periodo:periodo, ordine:entry.ordine}); }
+    try{ await sb.from('abit_abitudini').insert({id:entry.id, nome, tipo, unita, target_volte:volte, target_periodo:periodo, ordine:entry.ordine}); }
     catch(err){ queuePending('insert_habit', entry); }
   }
 }
@@ -866,7 +954,7 @@ function showHistory(habitId){
     <h2>Storico — ${esc(h.nome)}</h2>
     ${logs.length ? logs.map(l=>`
       <div class="history-item">
-        <div class="small">${fmtDateTime(l.fatto_at)}${l.nota?' · '+esc(l.nota):''}</div>
+        <div class="small">${fmtDateTime(l.fatto_at)}${h.tipo==='quantita'&&l.valore!=null?` — ${l.valore}${h.unita?' '+esc(h.unita):''}`:''}${l.nota?' · '+esc(l.nota):''}</div>
         <button class="del" onclick="deleteLog('${l.id}','${habitId}'); showHistory('${habitId}')">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
         </button>
@@ -900,16 +988,10 @@ function showUndoToast(msg, onUndo, onConfirm){
   let undone = false;
   t._confirm = ()=>{ if(!undone) onConfirm(); };
   t.querySelector('#undoBtn').onclick = ()=>{
-    undone = true;
-    clearTimeout(toastTimer);
-    t.remove();
-    onUndo();
+    undone = true; clearTimeout(toastTimer); t.remove(); onUndo();
   };
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=>{
-    if(!undone){ onConfirm(); }
-    t.remove();
-  }, 5000);
+  toastTimer = setTimeout(()=>{ if(!undone){ onConfirm(); } t.remove(); }, 5000);
 }
 
 /* ============ OFFLINE QUEUE ============ */
@@ -927,22 +1009,24 @@ async function flushPending(){
       if(item.action==='insert_habit') await sb.from('abit_abitudini').insert(item.data);
       else if(item.action==='update_habit'){ const {id, ...rest} = item.data; await sb.from('abit_abitudini').update(rest).eq('id', id); }
       else if(item.action==='delete_habit') await sb.from('abit_abitudini').delete().eq('id', item.data.id);
-      else if(item.action==='insert_log') await sb.from('abit_abitudini_log').insert({id:item.data.id, habit_id:item.data.habit_id, fatto_at:item.data.fatto_at, nota:item.data.nota});
+      else if(item.action==='insert_log') await sb.from('abit_abitudini_log').insert(item.data);
       else if(item.action==='delete_log') await sb.from('abit_abitudini_log').delete().eq('id', item.data.id);
     }catch(err){ remaining.push(item); }
   }
   localStorage.setItem(PENDING_KEY, JSON.stringify(remaining));
 }
-
 window.addEventListener('online', async ()=>{ setConn(true); await flushPending(); await loadAll(); });
 window.addEventListener('offline', ()=> setConn(false));
 
-/* ============ NOTIFICHE ============ */
+/* ============ NOTIFICHE ============
+   Limite onesto: funzionano solo quando l'app è aperta (nessun backend Web
+   Push), quindi sono un promemoria "all'apertura", non una vera notifica
+   che arriva ad app chiusa. */
 async function requestNotifPermission(){
   if(!('Notification' in window)){ alert('Notifiche non supportate su questo dispositivo.'); return; }
   const perm = await Notification.requestPermission();
   if(perm==='granted'){
-    alert("Notifiche attivate. Riceverai un promemoria quando apri l'app se ci sono abitudini da fare.");
+    alert('Promemoria attivato: quando apri l\'app, se ci sono abitudini da fare riceverai una notifica. Non arriva se l\'app è chiusa.');
     checkDailyReminder(true);
   }
 }
@@ -952,9 +1036,7 @@ function checkDailyReminder(force){
   const today = localDateKey();
   if(!force && lastCheck===today) return;
   const due = state.habits.filter(isDueToday);
-  if(due.length){
-    new Notification('Abitudini di oggi', { body: due.map(h=>h.nome).join(', ') });
-  }
+  if(due.length){ new Notification('Abitudini di oggi', { body: due.map(h=>h.nome).join(', ') }); }
   localStorage.setItem('ab_last_reminder', today);
 }
 
@@ -970,8 +1052,7 @@ if('serviceWorker' in navigator){
 }
 
 /* ============ INIT ============
-   L'avvio dell'app (caricamento dati) è gestito da onAuthStateChange sopra,
-   che scatta subito con la sessione corrente (se già loggato) o richiede login. */
+   L'avvio è gestito da onAuthStateChange sopra. */
 setInterval(()=>{ render(); }, 60000);
 </script>
 </body>
