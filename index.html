@@ -137,43 +137,10 @@ input[type=number]{width:90px;}
 <script>
 /* ============ CONFIG ============
    Stesso progetto Supabase di CaliMat / PesoDigiuno. */
-const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";
-const SUPABASE_ANON_KEY = "YOUR-ANON-KEY";
+const SUPABASE_URL = 'https://edlvmkjctzhqoswpppds.supabase.co/';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkbHZta2pjdHpocW9zd3BwcGRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNjEyMDEsImV4cCI6MjA5NjczNzIwMX0.Oq0TyYWG4LotZhH57LQtklUdVho_kQ15KlSs8KGO2AM';
+
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-/* ============ SCHEMA (SQL — esegui le ALTER se il progetto ha già le tabelle) ============
-create table abit_abitudini (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid references auth.users default auth.uid(),
-  nome text not null,
-  tipo text not null default 'checkbox',        -- checkbox | quantita
-  unita text,                                   -- solo per tipo 'quantita', es. 'km','litri','minuti','kcal'
-  target_volte numeric not null default 1,       -- n. volte (checkbox) oppure obiettivo quantità (quantita)
-  target_periodo text not null default 'giorno', -- giorno | settimana | mese | anno
-  ordine int not null default 0,
-  colore text default '#2dd4bf',
-  archiviata boolean default false,
-  created_at timestamptz default now()
-);
-create table abit_abitudini_log (
-  id uuid primary key default gen_random_uuid(),
-  habit_id uuid references abit_abitudini(id) on delete cascade,
-  user_id uuid references auth.users default auth.uid(),
-  fatto_at timestamptz not null default now(),
-  valore numeric,                                -- solo per tipo 'quantita'
-  nota text,
-  created_at timestamptz default now()
-);
-alter table abit_abitudini enable row level security;
-alter table abit_abitudini_log enable row level security;
-create policy "own rows" on abit_abitudini for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
-create policy "own rows" on abit_abitudini_log for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
-
--- Se le tabelle esistono già senza queste colonne:
--- alter table abit_abitudini add column if not exists tipo text not null default 'checkbox';
--- alter table abit_abitudini add column if not exists unita text;
--- alter table abit_abitudini_log add column if not exists valore numeric;
-=========================================================================== */
 
 const PERIOD_LABEL = {giorno:'giorno', settimana:'settimana', mese:'mese', anno:'anno'};
 const PENDING_KEY = 'ab_pending_sync';
